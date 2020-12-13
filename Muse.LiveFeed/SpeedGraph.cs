@@ -18,7 +18,7 @@ namespace Muse.LiveFeed
             public Channel Channel;
             public int XOffset;
             public int YOffset;
-            public Color Color;
+            public Pen Pen;
         }
 
         private readonly MuseSamplerService _museSamplerService;
@@ -37,28 +37,28 @@ namespace Muse.LiveFeed
                 Channel = Channel.EEG_AF7,
                 XOffset = 10,
                 YOffset = 20,
-                Color = Color.DodgerBlue
+                Pen = new Pen(Color.DodgerBlue)
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_AF8,
                 XOffset = 10,
                 YOffset = 140,
-                Color = Color.Green
+                Pen = new Pen(Color.Green)
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP9,
                 XOffset = 10,
                 YOffset = 260,
-                Color = Color.Orange
+                Pen = new Pen(Color.Orange)
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP10,
                 XOffset = 10,
                 YOffset = 380,
-                Color = Color.Yellow
+                Pen = new Pen(Color.Yellow)
             }
         };
 
@@ -69,28 +69,28 @@ namespace Muse.LiveFeed
                 Channel = Channel.EEG_AF7,
                 XOffset = 10,
                 YOffset = 500,
-                Color = Color.DodgerBlue
+                Pen = new Pen(Color.DodgerBlue)
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_AF8,
                 XOffset = 10,
                 YOffset = 500,
-                Color = Color.Green
+                Pen = new Pen(Color.Green)
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP9,
                 XOffset = 10,
                 YOffset = 500,
-                Color = Color.Orange
+                Pen = new Pen(Color.Orange)
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP10,
                 XOffset = 10,
                 YOffset = 500,
-                Color = Color.Yellow
+                Pen = new Pen(Color.Yellow)
             }
         };
 
@@ -147,13 +147,19 @@ namespace Muse.LiveFeed
                     PLOTPERIOD,
                     out var data))
                 {
+                    _plotterService.DrawPlotAxis(
+                        _graphicsBuffer,
+                        Pens.Gray,
+                        curPlot.YOffset,
+                        Width,
+                        PLOTHEIGHT,
+                        true);
                     _plotterService.Plot(
                         _graphicsBuffer,
                         data,
-                        curPlot.Color,
+                        curPlot.Pen,
                         curPlot.XOffset,
                         curPlot.YOffset,
-                        Width,
                         PLOTHEIGHT,
                         AMPLITUDE,
                         Zoom);
@@ -169,13 +175,19 @@ namespace Muse.LiveFeed
                     PLOTPERIOD,
                     out var data))
                 {
+                    _plotterService.DrawPlotAxis(
+                        _graphicsBuffer,
+                        Pens.Gray,
+                        curPlot.YOffset,
+                        Width,
+                        PLOTHEIGHT,
+                        false);
                     _plotterService.PlotFFT(
                         _graphicsBuffer,
                         data,
-                        curPlot.Color,
+                        curPlot.Pen,
                         curPlot.XOffset,
                         curPlot.YOffset,
-                        Width,
                         PLOTHEIGHT,
                         AMPLITUDE);
                 }

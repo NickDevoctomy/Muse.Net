@@ -5,13 +5,20 @@ namespace Muse.Net.Services
 {
     public interface IPlotterService
     {
+        void DrawPlotAxis(
+            Graphics graphics,
+            Pen pen,
+            int yOffset,
+            int width,
+            int height,
+            bool centreLine);
+
         void Plot(
             Graphics graphics,
             IList<float> data,
-            Color color,
+            Pen pen,
             int xOffset,
             int yOffset,
-            int width,
             int height,
             float amplitude,
             float zoom);
@@ -19,10 +26,9 @@ namespace Muse.Net.Services
         void PlotFFT(
             Graphics graphics,
             IList<float> data,
-            Color color,
+            Pen pen,
             int xOffset,
             int yOffset,
-            int width,
             int height,
             float amplitude);
     }

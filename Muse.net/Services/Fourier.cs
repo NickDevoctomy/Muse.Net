@@ -19,7 +19,6 @@ namespace Muse.Net.Services
             return result;
         }
 
-
         public static Complex[] DFT(ReadOnlySpan<float> data)
         {
             double pi2oN = -2.0 * Math.PI / data.Length;

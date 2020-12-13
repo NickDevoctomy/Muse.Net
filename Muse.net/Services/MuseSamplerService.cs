@@ -10,7 +10,7 @@ namespace Muse.Net.Services
         private DateTime? _firstSampledAt;
         private readonly MuseSamplerServiceConfiguration _configuration;
         private readonly Dictionary<Channel, List<RawSamplePacket>> _samples;
-        private readonly Object _lock = new object();
+        private readonly object _lock = new object();
 
         public MuseSamplerService(MuseSamplerServiceConfiguration configuration)
         {
