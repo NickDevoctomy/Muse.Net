@@ -17,7 +17,8 @@ namespace Muse.LiveFeed
         private struct PlotInfo
         {
             public Channel Channel;
-            public int Offset;
+            public int XOffset;
+            public int YOffset;
             public Color Color;
         }
 
@@ -35,25 +36,29 @@ namespace Muse.LiveFeed
             new PlotInfo
             {
                 Channel = Channel.EEG_AF7,
-                Offset = 20,
+                XOffset = 10,
+                YOffset = 20,
                 Color = Color.DodgerBlue
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_AF8,
-                Offset = 140,
+                XOffset = 10,
+                YOffset = 140,
                 Color = Color.Green
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP9,
-                Offset = 260,
+                XOffset = 10,
+                YOffset = 260,
                 Color = Color.Orange
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP10,
-                Offset = 380,
+                XOffset = 10,
+                YOffset = 380,
                 Color = Color.Yellow
             }
         };
@@ -63,13 +68,15 @@ namespace Muse.LiveFeed
             new PlotInfo
             {
                 Channel = Channel.EEG_AF7,
-                Offset = 500,
+                XOffset = 10,
+                YOffset = 500,
                 Color = Color.DodgerBlue
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP9,
-                Offset = 500,
+                XOffset = 10,
+                YOffset = 500,
                 Color = Color.Orange
             }
         };
@@ -122,7 +129,8 @@ namespace Muse.LiveFeed
                             graphics,
                             data,
                             curPlot.Color,
-                            curPlot.Offset,
+                            curPlot.XOffset,
+                            curPlot.YOffset,
                             PLOTHEIGHT,
                             Zoom);
                     }
@@ -141,7 +149,8 @@ namespace Muse.LiveFeed
                             graphics,
                             data,
                             curPlot.Color,
-                            curPlot.Offset,
+                            curPlot.XOffset,
+                            curPlot.YOffset,
                             PLOTHEIGHT);
                     }
                 }
@@ -167,14 +176,15 @@ namespace Muse.LiveFeed
             Graphics graphics,
             IList<float> data,
             Color color,
-            int offset,
+            int xOffset,
+            int yOffset,
             int height,
             float zoom)
         {
             var axispen = new Pen(Color.Gray, 1);
-            graphics.DrawLine(axispen, 10, offset, 10, offset + height);
+            graphics.DrawLine(axispen, 10, yOffset, 10, yOffset + height);
             int ymax = height / 2;
-            int y0 = offset + (int)ymax;
+            int y0 = yOffset + (int)ymax;
             graphics.DrawLine(axispen, 0, y0, this.Width, y0);
 
             float factor = zoom * (float)ymax / AMPLITUDE;
@@ -189,7 +199,7 @@ namespace Muse.LiveFeed
 
                 if (x > 0)
                 {
-                    graphics.DrawLine(pen, xa, ya, x, y);
+                    graphics.DrawLine(pen, xa + xOffset, ya, x + xOffset, y);
                 }
                 xa = x; ya = y;
             }   
@@ -199,16 +209,16 @@ namespace Muse.LiveFeed
             Graphics graphics,
             IList<float> data,
             Color color,
-            int offset,
+            int xOffset,
+            int yOffset,
             int height)
         {
             var axispen = new Pen(Color.Gray, 1);
-            graphics.DrawLine(axispen, 10, offset, 10, offset + height);
-            int y0 = offset + height;
-            graphics.DrawLine(axispen, 0, offset + height, this.Width, offset + height);
+            graphics.DrawLine(axispen, 10, yOffset, 10, yOffset + height);
+            int y0 = yOffset + height;
+            graphics.DrawLine(axispen, 0, yOffset + height, this.Width, yOffset + height);
 
             float factor = (float)height / AMPLITUDE;
-            int x0 = 10;
             int xa = 0, ya = height;
             Pen pen = new Pen(color, 2);
             for (int x = 0; x < data.Count /2; x+= 3)
@@ -221,7 +231,7 @@ namespace Muse.LiveFeed
 
                 if (x > 0)
                 {
-                    graphics.DrawLine(pen, x0 + xa*2, ya, x0 + x*2, y);
+                    graphics.DrawLine(pen, xOffset + xa*2, ya, xOffset + x*2, y);
                 }
                 xa = x; ya = y;
             }
