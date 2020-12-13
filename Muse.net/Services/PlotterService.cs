@@ -14,15 +14,30 @@ namespace Muse.Net.Services
             int height,
             bool centreLine)
         {
-            graphics.DrawLine(pen, 10, yOffset, 10, yOffset + height);
+            graphics.DrawLine(
+                pen,
+                10,
+                yOffset,
+                10,
+                yOffset + height);
             if(centreLine)
             {
                 int ymax = height / 2;
                 int y0 = yOffset + (int)ymax;
-                graphics.DrawLine(pen, 0, y0, width, y0);
+                graphics.DrawLine(
+                    pen,
+                    0,
+                    y0,
+                    width,
+                    y0);
             }
 
-            graphics.DrawLine(pen, 10, yOffset + height, width, yOffset + height);
+            graphics.DrawLine(
+                pen,
+                10,
+                yOffset + height,
+                width,
+                yOffset + height);
         }
 
         public void Plot(
@@ -38,7 +53,8 @@ namespace Muse.Net.Services
             int ymax = height / 2;
             int y0 = yOffset + (int)ymax;
             float factor = zoom * (float)ymax / amplitude;
-            int xa = 0, ya = 0;
+            int prevX = 0;
+            int prevY = 0;
             for (int x = 0; x < data.Count; x++)
             {
                 float actual = data[x] - amplitude;
@@ -48,9 +64,14 @@ namespace Muse.Net.Services
 
                 if (x > 0)
                 {
-                    graphics.DrawLine(pen, xa + xOffset, ya, x + xOffset, y);
+                    graphics.DrawLine(
+                        pen,
+                        prevX + xOffset,
+                        prevY,
+                        x + xOffset,
+                        y);
                 }
-                xa = x; ya = y;
+                prevX = x; prevY = y;
             }
         }
 
@@ -65,7 +86,8 @@ namespace Muse.Net.Services
         {
             int y0 = yOffset + height;
             float factor = (float)height / amplitude;
-            int xa = 0, ya = height;
+            int prevX = 0;
+            int prevY = height;
             for (int x = 0; x < data.Count / 2; x++)
             {
                 float actual = data[x] / 6;
@@ -74,10 +96,15 @@ namespace Muse.Net.Services
                 int y = y0 - v;
                 if (x > 0)
                 {
-                    graphics.DrawLine(pen, xOffset + xa * 2, ya, xOffset + x * 2, y);
+                    graphics.DrawLine(
+                        pen,
+                        xOffset + prevX * 2,
+                        prevY,
+                        xOffset + x * 2,
+                        y);
                 }
 
-                xa = x; ya = y;
+                prevX = x; prevY = y;
             }
         }
     }
