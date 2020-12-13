@@ -1,10 +1,8 @@
 ﻿using Harthoorn.MuseClient;
 using Muse.Net.Services;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace Muse.LiveFeed
@@ -65,7 +63,7 @@ namespace Muse.LiveFeed
         };
 
         private PlotInfo[] _fftPlots = new PlotInfo[]
-{
+        {
             new PlotInfo
             {
                 Channel = Channel.EEG_AF7,
@@ -169,7 +167,10 @@ namespace Muse.LiveFeed
                 }
             }
 
-            e.Graphics.DrawImage(_bitmapBuffer, 1, 1);
+            e.Graphics.DrawImageUnscaled(
+                _bitmapBuffer,
+                0,
+                0);
         }
 
         public void Append(

@@ -70,7 +70,14 @@ namespace Muse.LiveFeed
 
         private void button1_Click(object sender, EventArgs e)
         {
-            graph.Zoom += 2;
+            if(graph.Zoom < 10)
+            {
+                graph.Zoom += 1;
+            }
+            else
+            {
+                graph.Zoom = 1;
+            }
         }
 
         private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
