@@ -168,7 +168,7 @@ namespace Muse.LiveFeed
             e.Graphics.DrawImage(_bitmapBuffer, 1, 1);
             Interlocked.Exchange(ref updates, 0);
 
-            Invalidate();
+            //Invalidate();
         }
 
         public void Append(
@@ -179,6 +179,7 @@ namespace Muse.LiveFeed
                 channel,
                 values);
             Interlocked.Increment(ref updates);
+            Invalidate();
         }
 
         public void Draw(
