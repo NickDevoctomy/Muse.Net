@@ -50,9 +50,7 @@ namespace Muse.LiveFeed
                     Channel.EEG_AF7,
                     Channel.EEG_AF8,
                     Channel.EEG_TP10,
-                    Channel.EEG_TP9,
-                    Channel.EEG_AUX
-                    );
+                    Channel.EEG_TP9);
 
                 client.NotifyEeg += Client_NotifyEeg;
                 report("Starting...");
@@ -64,8 +62,7 @@ namespace Muse.LiveFeed
 
         private void Client_NotifyEeg(Channel channel, Encefalogram gram)
         {
-            graph.Append(channel, gram.Samples);
-            
+            graph.Append(channel, gram.Samples);   
         }
 
         private void button1_Click(object sender, EventArgs e)
