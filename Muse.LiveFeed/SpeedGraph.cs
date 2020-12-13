@@ -25,6 +25,7 @@ namespace Muse.LiveFeed
 
         private readonly MuseSamplerService _museSamplerService;
         private readonly FFTSamplerService _fftSamplerService;
+        private readonly PlotterService _plotterService;
 
         Bitmap _bitmapBuffer;
         Graphics _graphicsBuffer;
@@ -89,7 +90,8 @@ namespace Muse.LiveFeed
                     SamplePeriod = PLOTPERIOD
                 });
             _fftSamplerService = new FFTSamplerService();
-            
+            _plotterService = new PlotterService();
+
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
@@ -133,13 +135,15 @@ namespace Muse.LiveFeed
                     PLOTPERIOD,
                     out var data))
                 {
-                    Plot(
+                    _plotterService.Plot(
                         _graphicsBuffer,
                         data,
                         curPlot.Color,
                         curPlot.XOffset,
                         curPlot.YOffset,
+                        Width,
                         PLOTHEIGHT,
+                        AMPLITUDE,
                         Zoom);
                 }
             }
@@ -153,13 +157,15 @@ namespace Muse.LiveFeed
                     PLOTPERIOD,
                     out var data))
                 {
-                    PlotFFT(
+                    _plotterService.PlotFFT(
                         _graphicsBuffer,
                         data,
                         curPlot.Color,
                         curPlot.XOffset,
                         curPlot.YOffset,
-                        PLOTHEIGHT);
+                        Width,
+                        PLOTHEIGHT,
+                        AMPLITUDE);
                 }
             }
 
@@ -175,72 +181,5 @@ namespace Muse.LiveFeed
                 values);
             Invalidate();
         }
-
-        public void Plot(
-            Graphics graphics,
-            IList<float> data,
-            Color color,
-            int xOffset,
-            int yOffset,
-            int height,
-            float zoom)
-        {
-            var axispen = new Pen(Color.Gray, 1);
-            graphics.DrawLine(axispen, 10, yOffset, 10, yOffset + height);
-            int ymax = height / 2;
-            int y0 = yOffset + (int)ymax;
-            graphics.DrawLine(axispen, 0, y0, this.Width, y0);
-
-            float factor = zoom * (float)ymax / AMPLITUDE;
-            int xa = 0, ya = 0;
-            Pen pen = new Pen(color);
-            for (int x = 0; x < data.Count; x++)
-            {
-                float actual = data[x] - AMPLITUDE;
-                int v = (int)(factor * actual);
-                v = Math.Min(ymax, v); v = Math.Max(-ymax, v);
-                int y = y0 - v;
-
-                if (x > 0)
-                {
-                    graphics.DrawLine(pen, xa + xOffset, ya, x + xOffset, y);
-                }
-                xa = x; ya = y;
-            }   
-        }
-
-        public void PlotFFT(
-            Graphics graphics,
-            IList<float> data,
-            Color color,
-            int xOffset,
-            int yOffset,
-            int height)
-        {
-            var axispen = new Pen(Color.Gray, 1);
-            graphics.DrawLine(axispen, 10, yOffset, 10, yOffset + height);
-            int y0 = yOffset + height;
-            graphics.DrawLine(axispen, 0, yOffset + height, this.Width, yOffset + height);
-
-            float factor = (float)height / AMPLITUDE;
-            int xa = 0, ya = height;
-            Pen pen = new Pen(color, 2);
-            for (int x = 0; x < data.Count /2; x+= 3)
-            {
-                float actual = data[x] / 6;
-                int v = (int)(factor * actual);
-                v = Math.Min(height, v); //v = Math.Max(0, v);
-                
-                int y = y0 - v;
-
-                if (x > 0)
-                {
-                    graphics.DrawLine(pen, xOffset + xa*2, ya, xOffset + x*2, y);
-                }
-                xa = x; ya = y;
-            }
-        }
-    }
-
-    
+    }  
 }
