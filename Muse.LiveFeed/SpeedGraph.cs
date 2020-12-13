@@ -3,6 +3,7 @@ using Muse.Net.Services;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Muse.LiveFeed
@@ -199,7 +200,12 @@ namespace Muse.LiveFeed
                         62);
                     if(ranges != null)
                     {
-                        Console.WriteLine($"{curPlot.Channel} - Delta = {ranges[FrequencyRange.Delta]}, Theta = {ranges[FrequencyRange.Theta]}, Alpha = {ranges[FrequencyRange.Alpha]}, Beta = {ranges[FrequencyRange.Beta]}, Gamma = {ranges[FrequencyRange.Gamma]}");
+                        if(curPlot.Channel == Channel.EEG_AF7)
+                        {
+                            var orderedRanges = ranges.ToList().OrderByDescending(x => x.Value).ToList();
+                            Console.WriteLine($"Dominant frequency range on AF7 = {orderedRanges[0].Key}");
+                            //Console.WriteLine($"{curPlot.Channel} - Delta = {ranges[FrequencyRange.Delta]}, Theta = {ranges[FrequencyRange.Theta]}, Alpha = {ranges[FrequencyRange.Alpha]}, Beta = {ranges[FrequencyRange.Beta]}, Gamma = {ranges[FrequencyRange.Gamma]}");
+                        }
                     }
                 }
             }

@@ -15,6 +15,10 @@ namespace Muse.Net.Services
         {
             double freqPerIndex = (double)maxFrequencyHz / (double)count;
             int fromIndex = (int)Math.Floor((double)fromHz / freqPerIndex);
+            if (fromIndex == 0)
+            {
+                fromIndex = 1;
+            }
             int toIndex = (int)Math.Ceiling((double)toHz / freqPerIndex);
             var destArray = new float[toIndex - fromIndex];
             Array.Copy(data, fromIndex, destArray, 0, destArray.Length);
@@ -38,8 +42,8 @@ namespace Muse.Net.Services
                     data,
                     count,
                     maxFrequencyHz,
-                    0,
-                    4));
+                    0.1f,
+                    3.5f));
             ranges.Add(
                 FrequencyRange.Theta,
                 GetAverageOverRange(
