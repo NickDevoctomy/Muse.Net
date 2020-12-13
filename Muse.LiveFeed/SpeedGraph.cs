@@ -73,10 +73,24 @@ namespace Muse.LiveFeed
             },
             new PlotInfo
             {
+                Channel = Channel.EEG_AF8,
+                XOffset = 10,
+                YOffset = 500,
+                Color = Color.Green
+            },
+            new PlotInfo
+            {
                 Channel = Channel.EEG_TP9,
                 XOffset = 10,
                 YOffset = 500,
                 Color = Color.Orange
+            },
+            new PlotInfo
+            {
+                Channel = Channel.EEG_TP10,
+                XOffset = 10,
+                YOffset = 500,
+                Color = Color.Yellow
             }
         };
 
