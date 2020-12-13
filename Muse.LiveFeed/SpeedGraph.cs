@@ -14,6 +14,7 @@ namespace Muse.LiveFeed
     class SpeedGraph : Panel
     {
         private readonly MuseSamplerService _museSamplerService;
+        private readonly FFTSamplerService _fftSamplerService;
 
         Graphics graphics;
         Bitmap bitmap;
@@ -22,9 +23,6 @@ namespace Muse.LiveFeed
 
         public float Zoom = 1;
 
-        List<float> FFT_A = new List<float>();
-        List<float> FFT_B = new List<float>();
-
         public SpeedGraph()
         {
             _museSamplerService = new MuseSamplerService(
@@ -32,6 +30,7 @@ namespace Muse.LiveFeed
                 {
                     SamplePeriod = new TimeSpan(0, 0, 10)
                 });
+            _fftSamplerService = new FFTSamplerService();
 
             //this.DoubleBuffered = true;
             this.BackColor = Color.Green;
@@ -83,38 +82,24 @@ namespace Muse.LiveFeed
                 Draw(graphics, dataTP10, Color.Yellow, 380, 100, Zoom);
             }
 
-            DrawFFT(graphics, FFT_A, Color.DodgerBlue, 500, 100, 1);
-            DrawFFT(graphics, FFT_B, Color.Orange, 500, 100, 1);
+            if(_fftSamplerService.TryGetFFTSample(_museSamplerService, Channel.EEG_AF7, new TimeSpan(0, 0, 5), out var fftAF7))
+            {
+                DrawFFT(graphics, fftAF7, Color.DodgerBlue, 500, 100, 1);
+            }
+
+            if (_fftSamplerService.TryGetFFTSample(_museSamplerService, Channel.EEG_TP9, new TimeSpan(0, 0, 5), out var fftTP9))
+            {
+                DrawFFT(graphics, fftTP9, Color.DodgerBlue, 500, 100, 1);
+            }
 
             e.Graphics.DrawImage(bitmap, 1, 1);
             updates = 0;
         }
 
-        int m = 0;
         public void Append(Channel channel, float[] values)
         {
             _museSamplerService.Sample(channel, values);
             updates += 1;
-
-            m = (m + 1) % 30;
-            if (m == 1)
-            {
-                if (_museSamplerService.TryGetSamples(Channel.EEG_AF7, new TimeSpan(0, 0, 5), out var dataAF7))
-                {
-                    var len = dataAF7.Length;
-                    const int SIZE = 300;
-                    var d = dataAF7.Skip(len - SIZE).Take(SIZE).ToArray();
-                    FFT_A = Fourier.DFT(d).Magnitudes().ToList();
-                }
-
-                if (_museSamplerService.TryGetSamples(Channel.EEG_TP9, new TimeSpan(0, 0, 5), out var dataTP9))
-                {
-                    var len = dataTP9.Length;
-                    const int SIZE = 300;
-                    var d = dataTP9.Skip(len - SIZE).Take(SIZE).ToArray();
-                    FFT_B = Fourier.DFT(d).Magnitudes().ToList();
-                }
-            }
         }
 
         public void LimitFromStart<T>(List<T> list, int limit)
