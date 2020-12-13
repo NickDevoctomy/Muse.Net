@@ -28,6 +28,14 @@ namespace Muse.LiveFeed
             }
             else
             {
+                try
+                {
+
+                }
+                catch(Exception ex)
+                {
+
+                }
                 await StartFeed(Report);
 
             }

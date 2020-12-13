@@ -11,7 +11,7 @@ namespace Muse.Net.Services
             float fromHz,
             float toHz);
 
-        Dictionary<FrequencyRangeGroup, float> GetFrequencyRangeAverages(
+        Dictionary<FrequencyRange, float> GetFrequencyRangeAverages(
             float[] data,
             float count,
             float maxFrequencyHz);
