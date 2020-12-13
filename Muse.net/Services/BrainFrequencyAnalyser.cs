@@ -25,7 +25,7 @@ namespace Muse.Net.Services
             return destArray.Average();
         }
 
-        public Dictionary<FrequencyRange, float> GetFrequencyRangeAverages(
+        public Dictionary<FrequencyRangeGroup, float> GetFrequencyRangeAverages(
             float[] data,
             float count,
             float maxFrequencyHz)
@@ -35,47 +35,19 @@ namespace Muse.Net.Services
                 return null;
             }
 
-            var ranges = new Dictionary<FrequencyRange, float>();
-            ranges.Add(
-                FrequencyRange.Delta,
-                GetAverageOverRange(
-                    data,
-                    count,
-                    maxFrequencyHz,
-                    0.1f,
-                    3.5f));
-            ranges.Add(
-                FrequencyRange.Theta,
-                GetAverageOverRange(
-                    data,
-                    count,
-                    maxFrequencyHz,
-                    4,
-                    8));
-            ranges.Add(
-                FrequencyRange.Alpha,
-                GetAverageOverRange(
-                    data,
-                    count,
-                    maxFrequencyHz,
-                    8,
-                    12));
-            ranges.Add(
-                FrequencyRange.Beta,
-                GetAverageOverRange(
-                    data,
-                    count,
-                    maxFrequencyHz,
-                    12,
-                    30));
-            ranges.Add(
-                FrequencyRange.Gamma,
-                GetAverageOverRange(
-                    data,
-                    count,
-                    maxFrequencyHz,
-                    30,
-                    maxFrequencyHz));
+            var ranges = new Dictionary<FrequencyRangeGroup, float>();
+            foreach(var curRange in FrequencyRanges.All)
+            {
+                ranges.Add(
+                    curRange.FrequencyRangeGroup,
+                    GetAverageOverRange(
+                        data,
+                        count,
+                        maxFrequencyHz,
+                        curRange.FromHz,
+                        curRange.ToHz));
+            }
+
             return ranges;
         }
      }

@@ -1,11 +1,9 @@
 ﻿namespace Muse.Net.Services
 {
-    public enum FrequencyRange
+    public class FrequencyRange
     {
-        Delta,
-        Theta,
-        Alpha,
-        Beta,
-        Gamma
+        public FrequencyRangeGroup FrequencyRangeGroup { get; set; }
+        public float FromHz { get; set; }
+        public float ToHz { get; set; }
     }
 }
