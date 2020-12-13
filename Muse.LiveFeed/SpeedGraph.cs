@@ -29,8 +29,6 @@ namespace Muse.LiveFeed
         Bitmap _bitmapBuffer;
         Graphics _graphicsBuffer;
 
-        int updates = 0;
-
         public float Zoom { get; set; } = 1;
 
         private PlotInfo[] _rawPlots = new PlotInfo[]
@@ -135,7 +133,7 @@ namespace Muse.LiveFeed
                     PLOTPERIOD,
                     out var data))
                 {
-                    Draw(
+                    Plot(
                         _graphicsBuffer,
                         data,
                         curPlot.Color,
@@ -155,7 +153,7 @@ namespace Muse.LiveFeed
                     PLOTPERIOD,
                     out var data))
                 {
-                    DrawFFT(
+                    PlotFFT(
                         _graphicsBuffer,
                         data,
                         curPlot.Color,
@@ -166,9 +164,6 @@ namespace Muse.LiveFeed
             }
 
             e.Graphics.DrawImage(_bitmapBuffer, 1, 1);
-            Interlocked.Exchange(ref updates, 0);
-
-            //Invalidate();
         }
 
         public void Append(
@@ -178,11 +173,10 @@ namespace Muse.LiveFeed
             _museSamplerService.Sample(
                 channel,
                 values);
-            Interlocked.Increment(ref updates);
             Invalidate();
         }
 
-        public void Draw(
+        public void Plot(
             Graphics graphics,
             IList<float> data,
             Color color,
@@ -215,7 +209,7 @@ namespace Muse.LiveFeed
             }   
         }
 
-        public void DrawFFT(
+        public void PlotFFT(
             Graphics graphics,
             IList<float> data,
             Color color,
