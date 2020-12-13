@@ -4,24 +4,75 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Muse.LiveFeed
 {
-    class SpeedGraph : Panel
+    public class SpeedGraph : Panel
     {
+        private const float AMPLITUDE = 0x800;
+        private const int PLOTHEIGHT = 100;
+        private static readonly TimeSpan PLOTPERIOD = new TimeSpan(0, 0, 5);
+
+        private struct PlotInfo
+        {
+            public Channel Channel;
+            public int Offset;
+            public Color Color;
+        }
+
         private readonly MuseSamplerService _museSamplerService;
         private readonly FFTSamplerService _fftSamplerService;
 
-        Graphics graphics;
         Bitmap bitmap;
         Timer timer;
         int updates = 0;
 
-        public float Zoom = 1;
+        public float Zoom { get; set; } = 1;
+
+        private PlotInfo[] _rawPlots = new PlotInfo[]
+        {
+            new PlotInfo
+            {
+                Channel = Channel.EEG_AF7,
+                Offset = 20,
+                Color = Color.DodgerBlue
+            },
+            new PlotInfo
+            {
+                Channel = Channel.EEG_AF8,
+                Offset = 140,
+                Color = Color.Green
+            },
+            new PlotInfo
+            {
+                Channel = Channel.EEG_TP9,
+                Offset = 260,
+                Color = Color.Orange
+            },
+            new PlotInfo
+            {
+                Channel = Channel.EEG_TP10,
+                Offset = 380,
+                Color = Color.Yellow
+            }
+        };
+
+        private PlotInfo[] _fftPlots = new PlotInfo[]
+{
+            new PlotInfo
+            {
+                Channel = Channel.EEG_AF7,
+                Offset = 500,
+                Color = Color.DodgerBlue
+            },
+            new PlotInfo
+            {
+                Channel = Channel.EEG_TP9,
+                Offset = 500,
+                Color = Color.Orange
+            }
+        };
 
         public SpeedGraph()
         {
@@ -32,9 +83,7 @@ namespace Muse.LiveFeed
                 });
             _fftSamplerService = new FFTSamplerService();
 
-            //this.DoubleBuffered = true;
             this.BackColor = Color.Green;
-            graphics = this.CreateGraphics();
             timer = new Timer();
             timer.Enabled = true;
             timer.Interval = 100;
@@ -49,82 +98,87 @@ namespace Muse.LiveFeed
 
         private void Timer_Tick(object sender, EventArgs e)
         {
-            if (updates > 4) this.Invalidate();
-            
-
+            if (updates > 4) this.Invalidate();         
         }
 
         private void SpeedGraph_Paint(object sender, PaintEventArgs e)
         {
             bitmap = new Bitmap(this.Width, this.Height);
-            var graphics = Graphics.FromImage(bitmap);
-            graphics.SmoothingMode = SmoothingMode.AntiAlias;
-            graphics.CompositingQuality = CompositingQuality.HighSpeed;
-            graphics.CompositingMode = CompositingMode.SourceCopy;
-
-            if(_museSamplerService.TryGetSamples(Channel.EEG_AF7, new TimeSpan(0, 0, 5), out var dataAF7))
+            using (var graphics = Graphics.FromImage(bitmap))
             {
-                Draw(graphics, dataAF7, Color.DodgerBlue, 20, 100, Zoom);
-            }
+                graphics.SmoothingMode = SmoothingMode.AntiAlias;
+                graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                graphics.CompositingMode = CompositingMode.SourceCopy;
 
-            if (_museSamplerService.TryGetSamples(Channel.EEG_AF8, new TimeSpan(0, 0, 5), out var dataAF8))
-            {
-                Draw(graphics, dataAF8, Color.Green, 140, 100, Zoom);
-            }
+                // Plot raw channel data
+                foreach(var curPlot in _rawPlots)
+                {
+                    if (_museSamplerService.TryGetSamples(
+                        curPlot.Channel,
+                        PLOTPERIOD,
+                        out var data))
+                    {
+                        Draw(
+                            graphics,
+                            data,
+                            curPlot.Color,
+                            curPlot.Offset,
+                            PLOTHEIGHT,
+                            Zoom);
+                    }
+                }
 
-            if (_museSamplerService.TryGetSamples(Channel.EEG_TP9, new TimeSpan(0, 0, 5), out var dataTP9))
-            {
-                Draw(graphics, dataTP9, Color.Orange, 260, 100, Zoom);
-            }
+                // Plot FFTs
+                foreach(var curPlot in _fftPlots)
+                {
+                    if (_fftSamplerService.TryGetFFTSample(
+                        _museSamplerService,
+                        curPlot.Channel,
+                        PLOTPERIOD,
+                        out var data))
+                    {
+                        DrawFFT(
+                            graphics,
+                            data,
+                            curPlot.Color,
+                            curPlot.Offset,
+                            PLOTHEIGHT);
+                    }
+                }
 
-            if (_museSamplerService.TryGetSamples(Channel.EEG_TP10, new TimeSpan(0, 0, 5), out var dataTP10))
-            {
-                Draw(graphics, dataTP10, Color.Yellow, 380, 100, Zoom);
-            }
-
-            if(_fftSamplerService.TryGetFFTSample(_museSamplerService, Channel.EEG_AF7, new TimeSpan(0, 0, 5), out var fftAF7))
-            {
-                DrawFFT(graphics, fftAF7, Color.DodgerBlue, 500, 100, 1);
-            }
-
-            if (_fftSamplerService.TryGetFFTSample(_museSamplerService, Channel.EEG_TP9, new TimeSpan(0, 0, 5), out var fftTP9))
-            {
-                DrawFFT(graphics, fftTP9, Color.DodgerBlue, 500, 100, 1);
+                graphics.Flush();
             }
 
             e.Graphics.DrawImage(bitmap, 1, 1);
             updates = 0;
         }
 
-        public void Append(Channel channel, float[] values)
+        public void Append(
+            Channel channel,
+            float[] values)
         {
-            _museSamplerService.Sample(channel, values);
+            _museSamplerService.Sample(
+                channel,
+                values);
             updates += 1;
         }
 
-        public void LimitFromStart<T>(List<T> list, int limit)
-        {
-            int cut = Math.Max(0, list.Count - limit);
-            if (cut > 0) list.RemoveRange(0, cut);
-        }
-
-        const float AMPLITUDE = 0x800; 
-
-        public void Draw(Graphics graphics, IList<float> data, Color color, int offset, int height, float zoom)
+        public void Draw(
+            Graphics graphics,
+            IList<float> data,
+            Color color,
+            int offset,
+            int height,
+            float zoom)
         {
             var axispen = new Pen(Color.Gray, 1);
             graphics.DrawLine(axispen, 10, offset, 10, offset + height);
-
             int ymax = height / 2;
             int y0 = offset + (int)ymax;
             graphics.DrawLine(axispen, 0, y0, this.Width, y0);
 
-
             float factor = zoom * (float)ymax / AMPLITUDE;
-
             int xa = 0, ya = 0;
-            int count = data.Count;
-
             Pen pen = new Pen(color);
             for (int x = 0; x < data.Count; x++)
             {
@@ -138,25 +192,24 @@ namespace Muse.LiveFeed
                     graphics.DrawLine(pen, xa, ya, x, y);
                 }
                 xa = x; ya = y;
-            }
-           
+            }   
         }
 
-        public void DrawFFT(Graphics graphics, IList<float> data, Color color, int offset, int height, float zoom)
+        public void DrawFFT(
+            Graphics graphics,
+            IList<float> data,
+            Color color,
+            int offset,
+            int height)
         {
             var axispen = new Pen(Color.Gray, 1);
             graphics.DrawLine(axispen, 10, offset, 10, offset + height);
-
             int y0 = offset + height;
             graphics.DrawLine(axispen, 0, offset + height, this.Width, offset + height);
 
-
-            float factor = zoom * (float)height / AMPLITUDE;
-
+            float factor = (float)height / AMPLITUDE;
             int x0 = 10;
             int xa = 0, ya = height;
-            int count = data.Count;
-
             Pen pen = new Pen(color, 2);
             for (int x = 0; x < data.Count /2; x+= 3)
             {
@@ -172,7 +225,6 @@ namespace Muse.LiveFeed
                 }
                 xa = x; ya = y;
             }
-
         }
     }
 
