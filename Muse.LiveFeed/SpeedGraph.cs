@@ -24,6 +24,7 @@ namespace Muse.LiveFeed
         private readonly MuseSamplerService _museSamplerService;
         private readonly FFTSamplerService _fftSamplerService;
         private readonly PlotterService _plotterService;
+        private readonly BrainFrequencyAnalyser _bainFrequencyAnalyser;
 
         Bitmap _bitmapBuffer;
         Graphics _graphicsBuffer;
@@ -103,6 +104,7 @@ namespace Muse.LiveFeed
                 });
             _fftSamplerService = new FFTSamplerService();
             _plotterService = new PlotterService();
+            _bainFrequencyAnalyser = new BrainFrequencyAnalyser();
 
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
@@ -166,7 +168,7 @@ namespace Muse.LiveFeed
                 }
             }
 
-            // Plot FFTs
+            // Plot FFTs & Calculate dominant frequency ranges
             foreach (var curPlot in _fftPlots)
             {
                 if (_fftSamplerService.TryGetFFTSample(
@@ -190,6 +192,15 @@ namespace Muse.LiveFeed
                         curPlot.YOffset,
                         PLOTHEIGHT,
                         AMPLITUDE);
+
+                    var ranges = _bainFrequencyAnalyser.GetFrequencyRangeAverages(
+                        data,
+                        150,
+                        62);
+                    if(ranges != null)
+                    {
+                        Console.WriteLine($"{curPlot.Channel} - Delta = {ranges[FrequencyRange.Delta]}, Theta = {ranges[FrequencyRange.Theta]}, Alpha = {ranges[FrequencyRange.Alpha]}, Beta = {ranges[FrequencyRange.Beta]}, Gamma = {ranges[FrequencyRange.Gamma]}");
+                    }
                 }
             }
 
