@@ -1,4 +1,5 @@
 ﻿using Harthoorn.MuseClient;
+using Muse.Net.Services;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -12,6 +13,8 @@ namespace Muse.LiveFeed
 {
     class SpeedGraph : Panel
     {
+        private readonly MuseSamplerService _museSamplerService;
+
         Graphics graphics;
         Bitmap bitmap;
         Timer timer;
@@ -19,20 +22,17 @@ namespace Muse.LiveFeed
 
         public float Zoom = 1;
 
-        Dictionary<Channel, List<float>> data = new Dictionary<Channel, List<float>>()
-        {
-            { Channel.EEG_AF7, new List<float>() },
-            { Channel.EEG_AF8, new List<float>() },
-            { Channel.EEG_TP9, new List<float>() },
-            { Channel.EEG_TP10, new List<float>() },
-            { Channel.EEG_AUX, new List<float>() },
-        };
-
         List<float> FFT_A = new List<float>();
         List<float> FFT_B = new List<float>();
 
         public SpeedGraph()
         {
+            _museSamplerService = new MuseSamplerService(
+                new MuseSamplerServiceConfiguration
+                {
+                    SamplePeriod = new TimeSpan(0, 0, 10)
+                });
+
             //this.DoubleBuffered = true;
             this.BackColor = Color.Green;
             graphics = this.CreateGraphics();
@@ -57,55 +57,64 @@ namespace Muse.LiveFeed
 
         private void SpeedGraph_Paint(object sender, PaintEventArgs e)
         {
-            lock (data)
-            {
-                bitmap = new Bitmap(this.Width, this.Height);
-                var graphics = Graphics.FromImage(bitmap);
-                graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-                Draw(graphics, data[Channel.EEG_AF7], Color.DodgerBlue, 20, 100, Zoom);
-                Draw(graphics, data[Channel.EEG_AF8], Color.LightGreen, 140, 100, Zoom);
-                Draw(graphics, data[Channel.EEG_TP9], Color.DarkOrange, 260, 100, Zoom);
-                Draw(graphics, data[Channel.EEG_TP10], Color.DarkOrange, 380, 100, Zoom);
-                DrawFFT(graphics, FFT_A, Color.DodgerBlue, 500, 100, 1);
-                DrawFFT(graphics, FFT_B, Color.DarkOrange, 500, 100, 1);
+            bitmap = new Bitmap(this.Width, this.Height);
+            var graphics = Graphics.FromImage(bitmap);
+            graphics.SmoothingMode = SmoothingMode.AntiAlias;
+            graphics.CompositingQuality = CompositingQuality.HighSpeed;
+            graphics.CompositingMode = CompositingMode.SourceCopy;
 
-                e.Graphics.DrawImage(bitmap, 1, 1);
-                updates = 0;
+            if(_museSamplerService.TryGetSamples(Channel.EEG_AF7, new TimeSpan(0, 0, 5), out var dataAF7))
+            {
+                Draw(graphics, dataAF7, Color.DodgerBlue, 20, 100, Zoom);
             }
+
+            if (_museSamplerService.TryGetSamples(Channel.EEG_AF8, new TimeSpan(0, 0, 5), out var dataAF8))
+            {
+                Draw(graphics, dataAF8, Color.Green, 140, 100, Zoom);
+            }
+
+            if (_museSamplerService.TryGetSamples(Channel.EEG_TP9, new TimeSpan(0, 0, 5), out var dataTP9))
+            {
+                Draw(graphics, dataTP9, Color.Orange, 260, 100, Zoom);
+            }
+
+            if (_museSamplerService.TryGetSamples(Channel.EEG_TP10, new TimeSpan(0, 0, 5), out var dataTP10))
+            {
+                Draw(graphics, dataTP10, Color.Yellow, 380, 100, Zoom);
+            }
+
+            DrawFFT(graphics, FFT_A, Color.DodgerBlue, 500, 100, 1);
+            DrawFFT(graphics, FFT_B, Color.Orange, 500, 100, 1);
+
+            e.Graphics.DrawImage(bitmap, 1, 1);
+            updates = 0;
         }
 
         int m = 0;
         public void Append(Channel channel, float[] values)
         {
-            lock (data)
+            _museSamplerService.Sample(channel, values);
+            updates += 1;
+
+            m = (m + 1) % 30;
+            if (m == 1)
             {
-                var set = data[channel];
-
-                
-                set.AddRange(values);
-                LimitFromStart(set, this.Width);
-
-                m = (m + 1) % 30;
-                if (m == 1)
+                if (_museSamplerService.TryGetSamples(Channel.EEG_AF7, new TimeSpan(0, 0, 5), out var dataAF7))
                 {
-
-                    var datum = data[Channel.EEG_AF7];
-                    var len = datum.Count;
+                    var len = dataAF7.Length;
                     const int SIZE = 300;
-
-                    var d = datum.Skip(len - SIZE).Take(SIZE).ToArray();
+                    var d = dataAF7.Skip(len - SIZE).Take(SIZE).ToArray();
                     FFT_A = Fourier.DFT(d).Magnitudes().ToList();
-
-                    datum = data[Channel.EEG_TP9];
-                    d = datum.Skip(len - SIZE).Take(SIZE).ToArray();
-                    FFT_B = Fourier.DFT(d).Magnitudes().ToList();
                 }
 
-                updates += 1;
+                if (_museSamplerService.TryGetSamples(Channel.EEG_TP9, new TimeSpan(0, 0, 5), out var dataTP9))
+                {
+                    var len = dataTP9.Length;
+                    const int SIZE = 300;
+                    var d = dataTP9.Skip(len - SIZE).Take(SIZE).ToArray();
+                    FFT_B = Fourier.DFT(d).Magnitudes().ToList();
+                }
             }
-            
         }
 
         public void LimitFromStart<T>(List<T> list, int limit)
