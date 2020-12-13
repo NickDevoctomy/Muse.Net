@@ -6,6 +6,8 @@ namespace Muse.Net.Services
 {
     public class FFTSamplerService : IFFTSamplerService
     {
+        private const int SAMPLESIZE = 300;
+
         public bool TryGetFFTSample(
             IMuseSamplerService museSamplerService,
             Channel channel,
@@ -16,11 +18,10 @@ namespace Muse.Net.Services
             if (museSamplerService.TryGetSamples(
                 channel,
                 timeSpan,
-                out var dataTP9))
+                out var data))
             {
-                var len = dataTP9.Length;
-                const int SIZE = 300;
-                var d = dataTP9.Skip(len - SIZE).Take(SIZE).ToArray();
+                var len = data.Length;
+                var d = data.Skip(len - SAMPLESIZE).Take(SAMPLESIZE).ToArray();
                 samples = Fourier.DFT(d).Magnitudes();
                 return true;
             }
