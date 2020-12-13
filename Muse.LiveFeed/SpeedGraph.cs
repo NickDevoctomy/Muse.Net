@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace Muse.LiveFeed
@@ -25,8 +26,9 @@ namespace Muse.LiveFeed
         private readonly MuseSamplerService _museSamplerService;
         private readonly FFTSamplerService _fftSamplerService;
 
-        Bitmap bitmap;
-        Timer timer;
+        Bitmap _bitmapBuffer;
+        Graphics _graphicsBuffer;
+
         int updates = 0;
 
         public float Zoom { get; set; } = 1;
@@ -86,80 +88,87 @@ namespace Muse.LiveFeed
             _museSamplerService = new MuseSamplerService(
                 new MuseSamplerServiceConfiguration
                 {
-                    SamplePeriod = new TimeSpan(0, 0, 10)
+                    SamplePeriod = PLOTPERIOD
                 });
             _fftSamplerService = new FFTSamplerService();
-
-            this.BackColor = Color.Green;
-            timer = new Timer();
-            timer.Enabled = true;
-            timer.Interval = 100;
-            timer.Tick += Timer_Tick;
-
-            this.Paint += SpeedGraph_Paint;
             
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);
             UpdateStyles();
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        protected override void OnPaintBackground(PaintEventArgs e)
         {
-            if (updates > 4) this.Invalidate();         
         }
 
-        private void SpeedGraph_Paint(object sender, PaintEventArgs e)
+        protected override void OnPaint(PaintEventArgs e)
         {
-            bitmap = new Bitmap(this.Width, this.Height);
-            using (var graphics = Graphics.FromImage(bitmap))
+            if(_bitmapBuffer == null || (_bitmapBuffer.Width != Width || _bitmapBuffer.Height != Height))
             {
-                graphics.SmoothingMode = SmoothingMode.AntiAlias;
-                graphics.CompositingQuality = CompositingQuality.HighSpeed;
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-
-                // Plot raw channel data
-                foreach(var curPlot in _rawPlots)
+                if(_graphicsBuffer != null)
                 {
-                    if (_museSamplerService.TryGetSamples(
-                        curPlot.Channel,
-                        PLOTPERIOD,
-                        out var data))
-                    {
-                        Draw(
-                            graphics,
-                            data,
-                            curPlot.Color,
-                            curPlot.XOffset,
-                            curPlot.YOffset,
-                            PLOTHEIGHT,
-                            Zoom);
-                    }
+                    _graphicsBuffer.Dispose();
+                    _graphicsBuffer = null;
+                }
+                if(_bitmapBuffer != null)
+                {
+                    _bitmapBuffer.Dispose();
+                    _bitmapBuffer = null;
                 }
 
-                // Plot FFTs
-                foreach(var curPlot in _fftPlots)
-                {
-                    if (_fftSamplerService.TryGetFFTSample(
-                        _museSamplerService,
-                        curPlot.Channel,
-                        PLOTPERIOD,
-                        out var data))
-                    {
-                        DrawFFT(
-                            graphics,
-                            data,
-                            curPlot.Color,
-                            curPlot.XOffset,
-                            curPlot.YOffset,
-                            PLOTHEIGHT);
-                    }
-                }
-
-                graphics.Flush();
+                _bitmapBuffer = new Bitmap(this.Width, this.Height);
+                _graphicsBuffer = Graphics.FromImage(_bitmapBuffer);
+                _graphicsBuffer.SmoothingMode = SmoothingMode.AntiAlias;
+                _graphicsBuffer.CompositingQuality = CompositingQuality.HighSpeed;
+                _graphicsBuffer.CompositingMode = CompositingMode.SourceCopy;
+            }
+            else
+            {
+                _graphicsBuffer.Clear(Color.Black);
             }
 
-            e.Graphics.DrawImage(bitmap, 1, 1);
-            updates = 0;
+            // Plot raw channel data
+            foreach (var curPlot in _rawPlots)
+            {
+                if (_museSamplerService.TryGetSamples(
+                    curPlot.Channel,
+                    PLOTPERIOD,
+                    out var data))
+                {
+                    Draw(
+                        _graphicsBuffer,
+                        data,
+                        curPlot.Color,
+                        curPlot.XOffset,
+                        curPlot.YOffset,
+                        PLOTHEIGHT,
+                        Zoom);
+                }
+            }
+
+            // Plot FFTs
+            foreach (var curPlot in _fftPlots)
+            {
+                if (_fftSamplerService.TryGetFFTSample(
+                    _museSamplerService,
+                    curPlot.Channel,
+                    PLOTPERIOD,
+                    out var data))
+                {
+                    DrawFFT(
+                        _graphicsBuffer,
+                        data,
+                        curPlot.Color,
+                        curPlot.XOffset,
+                        curPlot.YOffset,
+                        PLOTHEIGHT);
+                }
+            }
+
+            e.Graphics.DrawImage(_bitmapBuffer, 1, 1);
+            Interlocked.Exchange(ref updates, 0);
+
+            Invalidate();
         }
 
         public void Append(
@@ -169,7 +178,7 @@ namespace Muse.LiveFeed
             _museSamplerService.Sample(
                 channel,
                 values);
-            updates += 1;
+            Interlocked.Increment(ref updates);
         }
 
         public void Draw(
