@@ -20,6 +20,8 @@ namespace Muse.LiveFeed
             public int XOffset;
             public int YOffset;
             public Pen Pen;
+            public bool Hide;
+            public bool ShowFFTRange;
         }
 
         private readonly MuseSamplerService _museSamplerService;
@@ -71,28 +73,36 @@ namespace Muse.LiveFeed
                 Channel = Channel.EEG_AF7,
                 XOffset = 10,
                 YOffset = 500,
-                Pen = new Pen(Color.DodgerBlue)
+                Pen = new Pen(Color.DodgerBlue),
+                Hide = false,
+                ShowFFTRange = true,
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_AF8,
                 XOffset = 10,
                 YOffset = 500,
-                Pen = new Pen(Color.Green)
+                Pen = new Pen(Color.Green),
+                Hide = true,
+                ShowFFTRange = false
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP9,
                 XOffset = 10,
                 YOffset = 500,
-                Pen = new Pen(Color.Orange)
+                Pen = new Pen(Color.Orange),
+                Hide = true,
+                ShowFFTRange = false
             },
             new PlotInfo
             {
                 Channel = Channel.EEG_TP10,
                 XOffset = 10,
                 YOffset = 500,
-                Pen = new Pen(Color.Yellow)
+                Pen = new Pen(Color.Yellow),
+                Hide = true,
+                ShowFFTRange = false
             }
         };
 
@@ -185,27 +195,36 @@ namespace Muse.LiveFeed
                         Width,
                         PLOTHEIGHT,
                         false);
-                    _plotterService.PlotFFT(
-                        _graphicsBuffer,
-                        data,
-                        curPlot.Pen,
-                        curPlot.XOffset,
-                        curPlot.YOffset,
-                        PLOTHEIGHT,
-                        AMPLITUDE);
 
-                    var ranges = _bainFrequencyAnalyser.GetFrequencyRangeAverages(
-                        data,
-                        150,
-                        62);
-                    if(ranges != null)
+                    if(!curPlot.Hide)
                     {
-                        if(curPlot.Channel == Channel.EEG_AF7)
+                        if (curPlot.ShowFFTRange)
                         {
-                            var orderedRanges = ranges.ToList().OrderByDescending(x => x.Value).ToList();
-                            Console.WriteLine($"Dominant frequency range on AF7 = {orderedRanges[0].Key}");
-                            //Console.WriteLine($"{curPlot.Channel} - Delta = {ranges[FrequencyRange.Delta]}, Theta = {ranges[FrequencyRange.Theta]}, Alpha = {ranges[FrequencyRange.Alpha]}, Beta = {ranges[FrequencyRange.Beta]}, Gamma = {ranges[FrequencyRange.Gamma]}");
+                            var ranges = _bainFrequencyAnalyser.GetFrequencyRangeAverages(
+                                data,
+                                150,
+                                62);
+                            if (ranges != null)
+                            {
+                                _plotterService.HighlightDominantFrequencyRange(
+                                    _graphicsBuffer,
+                                    ranges,
+                                    Brushes.Red,
+                                    curPlot.XOffset,
+                                    curPlot.YOffset,
+                                    PLOTHEIGHT);
+                            }
+
                         }
+
+                        _plotterService.PlotFFT(
+                            _graphicsBuffer,
+                            data,
+                            curPlot.Pen,
+                            curPlot.XOffset,
+                            curPlot.YOffset,
+                            PLOTHEIGHT,
+                            AMPLITUDE);
                     }
                 }
             }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace Muse.Net.Services
 {
@@ -106,6 +107,29 @@ namespace Muse.Net.Services
 
                 prevX = x; prevY = y;
             }
+        }
+
+        public void HighlightDominantFrequencyRange(
+            Graphics graphics,
+            Dictionary<FrequencyRange, float> ranges,
+            Brush brush,
+            int xOffset,
+            int yOffset,
+            int height)
+        {
+            var orderedRanges = ranges.ToList().OrderByDescending(x => x.Value).ToList();
+            var dominantRange = orderedRanges[0];
+
+            // TODO: This needs refactoring so that the calculations are moved elsewhere
+            double pixelsPerHz = (double)62 / (double)150;
+            int fromPixel = (int)Math.Floor((double)dominantRange.Key.FromHz / pixelsPerHz);
+            int toPixel = (int)Math.Ceiling((double)dominantRange.Key.ToHz / pixelsPerHz);
+            graphics.FillRectangle(
+                brush,
+                xOffset + fromPixel,
+                yOffset,
+                xOffset + toPixel,
+                yOffset + height);
         }
     }
 }

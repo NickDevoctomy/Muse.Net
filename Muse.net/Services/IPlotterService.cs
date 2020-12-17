@@ -31,5 +31,13 @@ namespace Muse.Net.Services
             int yOffset,
             int height,
             float amplitude);
+
+        void HighlightDominantFrequencyRange(
+            Graphics graphics,
+            Dictionary<FrequencyRange, float> Ranges,
+            Brush brush,
+            int xOffset,
+            int yOffset,
+            int height);
     }
 }

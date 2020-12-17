@@ -25,7 +25,7 @@ namespace Muse.Net.Services
             return destArray.Average();
         }
 
-        public Dictionary<FrequencyRangeGroup, float> GetFrequencyRangeAverages(
+        public Dictionary<FrequencyRange, float> GetFrequencyRangeAverages(
             float[] data,
             float count,
             float maxFrequencyHz)
@@ -35,11 +35,11 @@ namespace Muse.Net.Services
                 return null;
             }
 
-            var ranges = new Dictionary<FrequencyRangeGroup, float>();
+            var ranges = new Dictionary<FrequencyRange, float>();
             foreach(var curRange in FrequencyRanges.All)
             {
                 ranges.Add(
-                    curRange.FrequencyRangeGroup,
+                    curRange,
                     GetAverageOverRange(
                         data,
                         count,
