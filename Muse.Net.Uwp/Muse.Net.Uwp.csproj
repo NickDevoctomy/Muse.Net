@@ -133,7 +133,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\BrainFrequencyAnalyser.cs" />
     <Compile Include="Services\FFTSamplerService.cs" />
-    <Compile Include="Services\Fourier.cs" />
     <Compile Include="Services\FourierService.cs" />
     <Compile Include="Services\FrequencyRange.cs" />
     <Compile Include="Services\FrequencyRangeGroup.cs" />
