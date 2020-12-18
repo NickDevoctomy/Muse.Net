@@ -128,6 +128,7 @@
     <Compile Include="Muse\Command.cs" />
     <Compile Include="Muse\Models.cs" />
     <Compile Include="Muse\MuseClient.cs" />
+    <Compile Include="Muse\MuseClientNotifyEegEventArgs.cs" />
     <Compile Include="Muse\MuseGuid.cs" />
     <Compile Include="Muse\Parse.cs" />
     <Compile Include="Muse\Preset.cs" />

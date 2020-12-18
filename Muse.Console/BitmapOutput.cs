@@ -30,6 +30,21 @@ namespace ConsoleApp
                 await SavePicture("e:/temp/temp.bmp");
             }
         }
+
+        private static void Client_NotifyEeg(object sender, MuseClientNotifyEegEventArgs e)
+        {
+            if (e.Channel == Channel.EEG_AF7) data_AF7.AddRange(e.Encefalogram.Samples);
+            else if (e.Channel == Channel.EEG_AF8) data_AF8.AddRange(e.Encefalogram.Samples);
+            else if (e.Channel == Channel.EEG_TP9) data_TP9.AddRange(e.Encefalogram.Samples);
+            else if (e.Channel == Channel.EEG_TP10) data_TP10.AddRange(e.Encefalogram.Samples);
+            else if (e.Channel == Channel.EEG_AUX) data_AUX.AddRange(e.Encefalogram.Samples);
+
+            if (++n % 10 == 0)
+            {
+                Print.Encefalogram(e.Encefalogram);
+            }
+        }
+
         public static void Key()
         {
             while (!Console.KeyAvailable)
@@ -46,20 +61,6 @@ namespace ConsoleApp
         static List<float> data_AUX = new List<float>();
 
         static int n = 0;
-
-        private static void Client_NotifyEeg(Channel c, Encefalogram e)
-        {
-            if (c == Channel.EEG_AF7) data_AF7.AddRange(e.Samples);
-            else if (c == Channel.EEG_AF8) data_AF8.AddRange(e.Samples);
-            else if (c == Channel.EEG_TP9) data_TP9.AddRange(e.Samples);
-            else if (c == Channel.EEG_TP10) data_TP10.AddRange(e.Samples);
-            else if (c == Channel.EEG_AUX) data_AUX.AddRange(e.Samples);
-
-            if (++n % 10 == 0)
-            {
-                Print.Encefalogram(e);
-            }
-        }
 
         public static async Task SavePicture(string filename)
         {

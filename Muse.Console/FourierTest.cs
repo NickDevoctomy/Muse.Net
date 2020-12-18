@@ -32,21 +32,15 @@ namespace ConsoleApp
             }
         }
 
-        static int count = 100;
-        static List<double> data = new List<double>();
-        static double[] cosines = new double[count];
-        static double[] sinuses = new double[count];
-        static int x = 0;
-
-        private static void Client_NotifyEeg(Channel channel, Encefalogram e)
+        private static void Client_NotifyEeg(object sender, MuseClientNotifyEegEventArgs e)
         {
             if (++x % 5 == 0)
             {
-                var values = e.Samples.Select(f => (double)f).ToArray();
+                var values = e.Encefalogram.Samples.Select(f => (double)f).ToArray();
                 data.AddRange(values);
 
                 Console.WriteLine(".");
-                
+
                 for (int i = 0; i < count; i++)
                 {
 
@@ -58,6 +52,12 @@ namespace ConsoleApp
                 }
             }
         }
+
+        static int count = 100;
+        static List<double> data = new List<double>();
+        static double[] cosines = new double[count];
+        static double[] sinuses = new double[count];
+        static int x = 0;
 
         public static void Key()
         {

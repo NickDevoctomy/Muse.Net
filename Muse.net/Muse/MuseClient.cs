@@ -36,7 +36,7 @@ namespace Harthoorn.MuseClient
         public event Action<Telemetry> NotifyTelemetry;
         public event Action<Accelerometer> NotifyAccelerometer;
         public event Action<Gyroscope> NotifyGyroscope;
-        public event Action<Channel, Encefalogram> NotifyEeg;
+        public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
 
         public IList<Channel> Subscriptions { get; private set; } = new List<Channel>();
 
@@ -257,7 +257,7 @@ namespace Harthoorn.MuseClient
         private void TriggerNotifyEeg(Channel channel, ReadOnlySpan<byte> bytes)
         { 
             var eeg = Parse.Encefalogram(bytes);
-            NotifyEeg?.Invoke(channel, eeg);
+            NotifyEeg?.Invoke(this, new MuseClientNotifyEegEventArgs { Channel = channel, Encefalogram = eeg });
         }
 
         private void TriggerNotifyTelemetry(ReadOnlySpan<byte> bytes)
