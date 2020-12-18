@@ -5,14 +5,13 @@ namespace Harthoorn.MuseClient
 {
     public static class Parse
     {
-
         public static Telemetry Telemetry(ReadOnlySpan<byte> span)
         {
             return new Telemetry
             {
                 SequenceId = UShort(span, 0),
-                BatteryLevel = UShort(span, 2) / 512f, // percentage
-                Voltage = UShort(span, 4) * 2.2f, // don't know why
+                BatteryLevel = UShort(span, 2) / 512f,      // percentage
+                Voltage = UShort(span, 4) * 2.2f,           // don't know why
                 Temperature = UShort(span, 8)
             };
         }
@@ -38,7 +37,6 @@ namespace Harthoorn.MuseClient
         public static Encefalogram Encefalogram(ReadOnlySpan<byte> span)
         {
             var samples = EegSamples(span.Slice(2));
-            //ScaleEeg(samples);
             return new Encefalogram
             {
                 Index = UShort(span, 0),
@@ -80,7 +78,6 @@ namespace Harthoorn.MuseClient
             }
         }
         
-
         public static Vector[] Samples(ReadOnlySpan<byte> span, int count, float scale)
         {
             var samples = new Vector[3];
@@ -109,7 +106,5 @@ namespace Harthoorn.MuseClient
         { 
             return BinaryPrimitives.ReadInt16BigEndian(span.Slice(index, 2));
         }
-
-
     }
 }

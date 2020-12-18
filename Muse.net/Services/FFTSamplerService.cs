@@ -6,6 +6,7 @@ namespace Muse.Net.Services
 {
     public class FFTSamplerService : IFFTSamplerService
     {
+        private IFourierService _fourierService = new FourierService();
         private const int SAMPLESIZE = 300;
 
         public bool TryGetFFTSample(
@@ -22,7 +23,8 @@ namespace Muse.Net.Services
             {
                 var len = data.Length;
                 var d = data.Skip(len - SAMPLESIZE).Take(SAMPLESIZE).ToArray();
-                samples = Fourier.DFT(d).Magnitudes();
+                var samplesDft = _fourierService.DFT(d);
+                samples = _fourierService.Magnitudes(samplesDft);
                 return true;
             }
 

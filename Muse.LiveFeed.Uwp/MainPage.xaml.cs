@@ -7,9 +7,9 @@ namespace Muse.LiveFeed.Uwp
 {
     public sealed partial class MainPage : Page
     {
-        private readonly MuseSamplerService _museSamplerService;
-        private readonly FFTSamplerService _fftSamplerService;
-        private readonly BrainFrequencyAnalyser _bainFrequencyAnalyser;
+        private readonly IMuseSamplerService _museSamplerService = new MuseSamplerService(new MuseSamplerServiceConfiguration { SamplePeriod = new System.TimeSpan(0, 0, 5) });
+        //private readonly IFFTSamplerService _fftSamplerService;
+        //private readonly IBrainFrequencyAnalyser _bainFrequencyAnalyser;
         private MuseClient _museClient = new MuseClient();
 
         public MainPage()

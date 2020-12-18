@@ -30,14 +30,12 @@ namespace Muse.LiveFeed
             {
                 try
                 {
-
+                    await StartFeed(Report);
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
-
-                }
-                await StartFeed(Report);
-
+                    Report("Failed, try again.");
+                }              
             }
         }
 

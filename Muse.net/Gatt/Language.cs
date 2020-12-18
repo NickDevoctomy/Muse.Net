@@ -12,8 +12,7 @@ namespace Harthoorn.MuseClient
             var bytes = Encoding.UTF8.GetBytes(text);
             bytes[0] = (byte)(bytes.Length - 1);
             var buffer = bytes.AsBuffer();
-            return buffer;
-           
+            return buffer;  
         }
     }
 }

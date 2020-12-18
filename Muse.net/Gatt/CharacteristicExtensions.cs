@@ -14,25 +14,6 @@ namespace Harthoorn.MuseClient
             return (status == GattCommunicationStatus.Success);
         }
 
-
-        public async static Task<bool> Start(this GattCharacteristic control, GattCharacteristic c)
-        {
-            var ok = await control.WriteCommand(MuseCommand.PAUSE);
-
-            if (ok)
-                ok = await control.WriteCommand(Preset.ACELEROMETER);
-
-            if (ok)
-                ok = await control.WriteCommand(MuseCommand.START);
-
-            if (ok)
-                ok = await control.WriteCommand(MuseCommand.RESUME);
-
-            return ok;
-        }
-
-        
-
         public static GattCharacteristic GetCharacteristic(this GattDeviceService service, Guid UUID)
         {
             return service.GetCharacteristics(UUID).FirstOrDefault();

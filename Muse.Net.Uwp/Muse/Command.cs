@@ -6,5 +6,4 @@
         public const string PAUSE = "h";
         public const string RESUME = "d";
     }
-
 }

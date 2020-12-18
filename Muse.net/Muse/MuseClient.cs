@@ -11,34 +11,31 @@ namespace Harthoorn.MuseClient
 {
     public class MuseClient
     {
+        public event Action<Telemetry> NotifyTelemetry;
+        public event Action<Accelerometer> NotifyAccelerometer;
+        public event Action<Gyroscope> NotifyGyroscope;
+        public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
+
         public string Name { get; private set; }
         public ulong Address { get; private set; }
         public bool Connected { get; private set; } = false;
-
-        public MuseClient()
-        {
-        }
+        public IList<Channel> Subscriptions { get; private set; } = new List<Channel>();
 
         private BluetoothLEDevice device;
         private GattDeviceService service;
-
         private GattCharacteristic ch_control;
         private GattCharacteristic ch_accelerometer;
         private GattCharacteristic ch_gyroscope;
         private GattCharacteristic ch_telemetry;
-
         private GattCharacteristic ch_EEG_TP9;
         private GattCharacteristic ch_EEG_AF7;
         private GattCharacteristic ch_EEG_AF8;
         private GattCharacteristic ch_EEG_TP10;
         private GattCharacteristic ch_EEG_AUX;
 
-        public event Action<Telemetry> NotifyTelemetry;
-        public event Action<Accelerometer> NotifyAccelerometer;
-        public event Action<Gyroscope> NotifyGyroscope;
-        public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
-
-        public IList<Channel> Subscriptions { get; private set; } = new List<Channel>();
+        public MuseClient()
+        {
+        }
 
         public async Task<bool> Connect()
         {
@@ -74,7 +71,6 @@ namespace Harthoorn.MuseClient
             return true;
         }
 
-        /// <returns>BluetoothAddress if a paired Muse bluetooth device is found</returns>
         public static Task<ulong?> FindPairedMuseDevice()
         {
             string query = BluetoothLEDevice.GetDeviceSelectorFromPairingState(true);
@@ -85,7 +81,7 @@ namespace Harthoorn.MuseClient
             {
                 if (args.Name.IndexOf("Muse") < 0)
                     return;
-                devWatch.Stop(); // Stop immediately, otherwise EnumerationCompleted is triggered
+                devWatch.Stop();
 
                 var device = await BluetoothLEDevice.FromIdAsync(args.Id);
                 tcs.TrySetResult(device.BluetoothAddress);
@@ -166,7 +162,6 @@ namespace Harthoorn.MuseClient
             return ok;
         }
 
-
         private void Notify(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
             var bytes = args.CharacteristicValue.ToArray();
@@ -184,7 +179,6 @@ namespace Harthoorn.MuseClient
 
             }
         }
-
 
         private async Task<bool> SubscribeEvent(Channel channel, TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler)
         {
@@ -217,10 +211,6 @@ namespace Harthoorn.MuseClient
             }
         }
 
-        /// <summary>
-        /// Awaits one channel event and returns the resulting buffer. 
-        /// </summary>
-        /// <param name="channel"></param>
         public async Task<byte[]> SingleChannelEventAsync(Channel channel)
         {
             var completion = new TaskCompletionSource<byte[]>();
@@ -241,8 +231,6 @@ namespace Harthoorn.MuseClient
             }
         }
 
-     
-
         public async Task<Telemetry> ReadTelemetryAsync()
         {
             var bytes = await SingleChannelEventAsync(Channel.Telemetry);
@@ -252,7 +240,6 @@ namespace Harthoorn.MuseClient
             }
             else return null;
         }
-
 
         private void TriggerNotifyEeg(Channel channel, ReadOnlySpan<byte> bytes)
         { 
@@ -307,12 +294,8 @@ namespace Harthoorn.MuseClient
             if (ch == ch_EEG_TP10) return Channel.EEG_TP10;
             if (ch == ch_EEG_AUX) return Channel.EEG_AUX;
 
-            return Channel.None;
-            
+            return Channel.None;        
         }
-
-
-
     }
 
 }

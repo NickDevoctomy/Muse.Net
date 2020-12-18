@@ -24,9 +24,9 @@ namespace Harthoorn.MuseClient
 
     public class Encefalogram
     {
-        public float Index; //?
+        public float Index;                 //?
         public DateTimeOffset Timestamp;
-        public float[] Samples; // Each message holds 12 samples each time
+        public float[] Samples;             // Each message holds 12 samples each time
         public byte[] Raw;
     }
 
@@ -42,5 +42,4 @@ namespace Harthoorn.MuseClient
             return new Vector { X = vector.X * f, Y= vector.Y * f, Z = vector.Z * f };
         }
     }
-
 }

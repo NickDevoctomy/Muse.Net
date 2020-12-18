@@ -11,4 +11,23 @@
     <ProjectReference Include="..\Muse.Net\Muse.Net.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Windows">
+      <HintPath>Uwp\Windows.winmd</HintPath>
+      <IsWinMDFile>true</IsWinMDFile>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Uwp\System.Runtime.WindowsRuntime.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Uwp\System.Runtime.WindowsRuntime.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Uwp\Windows.winmd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

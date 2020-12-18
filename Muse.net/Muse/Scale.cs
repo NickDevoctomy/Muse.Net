@@ -7,5 +7,4 @@
         public const float EEG = 0.48828125f;
         public const int EEG_OFSET = 0x800;
     }
-
 }
