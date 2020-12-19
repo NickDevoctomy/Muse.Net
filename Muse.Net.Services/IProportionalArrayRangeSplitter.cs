@@ -2,7 +2,7 @@
 
 namespace Muse.Net.Services
 {
-    public interface IArrayRangeSplitter
+    public interface IProportionalArrayRangeSplitter
     {
         SplitRangeResult SplitRange(
             Array sourceArray,

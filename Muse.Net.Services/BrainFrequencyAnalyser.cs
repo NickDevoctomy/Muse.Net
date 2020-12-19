@@ -7,7 +7,7 @@ namespace Muse.Net.Services
 {
     public class BrainFrequencyAnalyser : IBrainFrequencyAnalyser
     {
-        private IArrayRangeSplitter _arrayRangeSplitter = new ArrayRangeSplitter();
+        private IProportionalArrayRangeSplitter _arrayRangeSplitter = new ProportionalArrayRangeSplitter();
 
         public float GetAverageOverRange(
             float[] data,
