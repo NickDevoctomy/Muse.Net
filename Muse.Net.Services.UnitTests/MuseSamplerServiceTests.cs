@@ -12,7 +12,7 @@ namespace Muse.Net.Services.UnitTests
             // Arrange
             var config = new MuseSamplerServiceConfiguration
             {
-                SamplePeriod = new System.TimeSpan(0, 0, 1)
+                SamplePeriod = new System.TimeSpan(0, 0, 10)
             };
             var sut = new MuseSamplerService(config);
             var channel = Channel.EEG_AF7;
@@ -36,7 +36,7 @@ namespace Muse.Net.Services.UnitTests
             // Arrange
             var config = new MuseSamplerServiceConfiguration
             {
-                SamplePeriod = new System.TimeSpan(0, 0, 1)
+                SamplePeriod = new System.TimeSpan(0, 0, 10)
             };
             var sut = new MuseSamplerService(config);
             var channel = Channel.EEG_AF7;
@@ -61,7 +61,7 @@ namespace Muse.Net.Services.UnitTests
             // Arrange
             var config = new MuseSamplerServiceConfiguration
             {
-                SamplePeriod = new System.TimeSpan(0, 0, 1)
+                SamplePeriod = new System.TimeSpan(0, 0, 10)
             };
             var sut = new MuseSamplerService(config);
             var channel = Channel.EEG_AF7;
@@ -88,7 +88,7 @@ namespace Muse.Net.Services.UnitTests
             // Arrange
             var config = new MuseSamplerServiceConfiguration
             {
-                SamplePeriod = new System.TimeSpan(0, 0, 1)
+                SamplePeriod = new System.TimeSpan(0, 0, 10)
             };
             var sut = new MuseSamplerService(config);
             var channel = Channel.EEG_AF7;
@@ -107,6 +107,38 @@ namespace Muse.Net.Services.UnitTests
             // Assert
             Assert.True(gotSamples);
             Assert.Empty(samples);
+        }
+
+        [Fact]
+        public async Task GivenSamplePeriodOf1Second_AndSample10Values_AndWait2Seconds_AndSample1Value_WheTryGetSamplesForLast5Seconds_Then1SamplesReturned()
+        {
+            // Arrange
+            var config = new MuseSamplerServiceConfiguration
+            {
+                SamplePeriod = new System.TimeSpan(0, 0, 1)
+            };
+            var sut = new MuseSamplerService(config);
+            var channel = Channel.EEG_AF7;
+            var values = new float[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            sut.Sample(
+                channel,
+                values);
+            await Task.Delay(2000);
+            values = new float[] { 0 };
+            sut.Sample(
+                channel,
+                values);
+
+            // Act
+            var gotSamples = sut.TryGetSamples(
+                    channel,
+                    new System.TimeSpan(0, 0, 5),
+                    out var samples);
+
+            // Assert
+            Assert.True(gotSamples);
+            Assert.Single(samples);
+            Assert.Equal(values, samples);
         }
     }
 }
