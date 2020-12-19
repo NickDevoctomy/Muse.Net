@@ -1,11 +1,17 @@
 ﻿using Muse.Net.Models;
 using Muse.Net.Models.Enums;
+using System;
 using System.Threading.Tasks;
 
 namespace Muse.Net.Services
 {
     public interface IMuseClient
     {
+        event EventHandler<MuseClientNotifyTelemetryEventArgs> NotifyTelemetry;
+        event EventHandler<MuseClientNotifyAccelerometerEventArgs> NotifyAccelerometer;
+        event EventHandler<MuseClientNotifyGyroscopeEventArgs> NotifyGyroscope;
+        event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
+
         bool Connected { get; }
 
         Task<bool> Connect(ulong deviceAddress);

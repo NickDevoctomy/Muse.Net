@@ -1,7 +1,7 @@
 ﻿using Muse.Net.Models;
 using System;
 
-namespace Muse.Net.Client
+namespace Muse.Net.Services
 {
     public class MuseClientNotifyGyroscopeEventArgs : EventArgs
     {

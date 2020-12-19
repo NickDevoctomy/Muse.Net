@@ -1,4 +1,5 @@
-﻿using Muse.Net.Services;
+﻿using Muse.Net.Models;
+using Muse.Net.Services;
 using System;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth.Advertisement;
@@ -7,7 +8,7 @@ namespace Muse.Net.Uwp.Client
 {
     public class UwpMuseDeviceDiscoveryService : IMuseDeviceDiscoveryService
     {
-        public Task GetMuseDevices(Action<string, string> foundCallback)
+        public Task<int> GetMuseDevices(Action<MuseDevice> foundCallback)
         {
             var bleWatcher = new BluetoothLEAdvertisementWatcher
             {
@@ -25,8 +26,11 @@ namespace Muse.Net.Uwp.Client
 
                 count = +1;
                 foundCallback(
-                    args.Advertisement.LocalName,
-                    args.BluetoothAddress.ToString());
+                    new MuseDevice
+                    {
+                        Name = args.Advertisement.LocalName,
+                        Id = args.BluetoothAddress.ToString()
+                    });
             };
             bleWatcher.Stopped += (w, args) =>
             {

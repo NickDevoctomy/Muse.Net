@@ -1,11 +1,11 @@
-﻿using System;
-using System.Threading;
+﻿using Muse.Net.Models;
+using System;
 using System.Threading.Tasks;
 
 namespace Muse.Net.Services
 {
     public interface IMuseDeviceDiscoveryService
     {
-        Task GetMuseDevices(Action<string, string> foundCallback);
+        Task<int> GetMuseDevices(Action<MuseDevice> foundCallback);
     }
 }

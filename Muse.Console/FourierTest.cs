@@ -6,6 +6,7 @@ using System.Threading;
 using System.Linq;
 using Muse.Net.Client;
 using Muse.Net.Models.Enums;
+using Muse.Net.Services;
 
 namespace ConsoleApp
 {

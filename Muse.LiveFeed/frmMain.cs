@@ -1,4 +1,5 @@
 ﻿using Muse.Net.Client;
+using Muse.Net.Models;
 using Muse.Net.Models.Enums;
 using Muse.Net.Services;
 using System;
@@ -22,11 +23,11 @@ namespace Muse.LiveFeed
             _client = new MuseClient();
         }
 
-        private void FoundMuseDevice(string name, string id)
+        private void FoundMuseDevice(MuseDevice museDevice)
         {
             _devices.Invoke(new MethodInvoker(() =>
            {
-               _devices.AddDeviceToList(name);
+               _devices.AddDeviceToList(museDevice);
            }));     
         }
 
@@ -61,28 +62,32 @@ namespace Muse.LiveFeed
             _devices.FormClosing += _devices_FormClosing;
             _devices.Show();
             return _museDeviceDiscoveryService.GetMuseDevices(FoundMuseDevice);
-
-            //var ok = await client.Connect();
-            //if (ok)
-            //{
-            //    await client.Subscribe(
-            //        Channel.EEG_AF7,
-            //        Channel.EEG_AF8,
-            //        Channel.EEG_TP10,
-            //        Channel.EEG_TP9);
-
-            //    client.NotifyEeg += Client_NotifyEeg1;
-            //    report("Starting...");
-            //    await client.Resume();
-            //    report("Running.");
-            //    btnStart.Text = "Start";
-            //}
         }
 
         private void _devices_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //cancel searching task
-            //_searching;
+            var connecting = Connect(_devices.SelectedDevice);
+            _devices.Dispose();
+            _devices = null;
+        }
+
+        private async Task Connect(MuseDevice museDevice)
+        {
+            var ok = await _client.Connect(ulong.Parse(museDevice.Id));
+            if (ok)
+            {
+                await _client.Subscribe(
+                    Channel.EEG_AF7,
+                    Channel.EEG_AF8,
+                    Channel.EEG_TP10,
+                    Channel.EEG_TP9);
+
+                _client.NotifyEeg += Client_NotifyEeg1;
+                Report("Starting...");
+                await _client.Resume();
+                Report("Running.");
+                btnStart.Text = "Start";
+            }
         }
 
         private void Client_NotifyEeg1(object sender, MuseClientNotifyEegEventArgs e)

@@ -2,7 +2,7 @@
 using Muse.Net.Models.Enums;
 using System;
 
-namespace Muse.Net.Client
+namespace Muse.Net.Services
 {
     public class MuseClientNotifyEegEventArgs : EventArgs
     {
