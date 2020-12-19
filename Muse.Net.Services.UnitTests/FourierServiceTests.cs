@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.Linq;
+using System.Numerics;
 using Xunit;
 
 namespace Muse.Net.Services.UnitTests
@@ -46,6 +47,53 @@ namespace Muse.Net.Services.UnitTests
 
             // Assert
             Assert.Equal(expectedResult, results);
+        }
+
+        [Fact]
+        public void GivenData_WhenDFT_ThenCorrectValuesReturned()
+        {
+            // Arrange
+            var data = new System.ReadOnlySpan<float>(new float[]
+            {
+                2986,
+                529,
+                237,
+                2621,
+                2048,
+                2046,
+                1983,
+                2278,
+                1129,
+                1101,
+                3613,
+                179
+            });
+            var expectedResults = new Complex[]
+                {
+                    new Complex(20750, 0),
+                    new Complex(-1792.0478600845327, 548.8244170983645),
+                    new Complex(249.4999999999946, 3215.552324251618),
+                    new Complex(330, 1401.9999999999977),
+                    new Complex(2661.5000000000095, -4223.605894256716),
+                    new Complex(4471.047860084534, -3706.8244170983617),
+                    new Complex(3242, 1.7251832802508072E-12),
+                    new Complex(4471.047860084529, 3706.8244170983653),
+                    new Complex(2661.4999999999814, 4223.605894256691),
+                    new Complex(329.99999999999187, -1402.0000000000186),
+                    new Complex(249.50000000000324, -3215.5523242516265),
+                    new Complex(-1792.0478600845172, -548.8244170983775)
+                };
+            var sut = new FourierService();
+
+            // Act
+            var results = sut.DFT(data);
+
+            // Assert
+            var expectedString = string.Join('-', expectedResults.Select(x => $"{x.Real},{x.Imaginary}").ToArray());
+            var actualString = string.Join('-', results.Select(x => $"{x.Real},{x.Imaginary}").ToArray());
+            Assert.Equal(
+                expectedString,
+                actualString);
         }
     }
 }

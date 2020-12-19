@@ -33,12 +33,5 @@ namespace Muse.Net.Services
             for (int i = 0; i < array.Length; i++) result[i] = (float)array[i].Magnitude;
             return result;
         }
-
-        public double[] Reals(Complex[] array)
-        {
-            double[] result = new double[array.Length];
-            for (int i = 0; i < array.Length; i++) result[i] = array[i].Real;
-            return result;
-        }
     }
 }
