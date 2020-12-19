@@ -46,15 +46,6 @@ namespace Muse.Net.Client
         {
         }
 
-        public async Task<bool> Connect()
-        {
-            ulong? bluetoothDeviceId = await FindPairedMuseDevice();
-            if (bluetoothDeviceId == null)
-                return false; // No muse found
-            
-            return await Connect(bluetoothDeviceId.Value);
-        }
-
 #if WINDOWS_UWP
 
         public async Task<bool> Connect(ulong deviceAddress)
@@ -96,28 +87,6 @@ namespace Muse.Net.Client
             return true;
         }
 
-        public static Task<ulong?> FindPairedMuseDevice()
-        {
-            var bleWatcher = new BluetoothLEAdvertisementWatcher
-            {
-                ScanningMode = BluetoothLEScanningMode.Active
-            };
-            var tcs = new TaskCompletionSource<ulong?>();
-
-            bleWatcher.Received += (w, btAdv) =>
-            {
-                if (btAdv.Advertisement.LocalName.IndexOf("Muse") < 0)
-                {
-                    return;
-                }
-
-                tcs.TrySetResult(btAdv.BluetoothAddress);
-            };
-
-            bleWatcher.Start();
-            return tcs.Task;
-        }
-
 #else
 
         public async Task<bool> Connect(ulong deviceAddress)
@@ -142,30 +111,6 @@ namespace Muse.Net.Client
 
             Connected = true;
             return true;
-        }
-
-        public static Task<ulong?> FindPairedMuseDevice()
-        {
-            string query = BluetoothLEDevice.GetDeviceSelectorFromPairingState(true);
-            var devWatch = DeviceInformation.CreateWatcher(query);
-            var tcs = new TaskCompletionSource<ulong?>();
-   
-            devWatch.Added += async (DeviceWatcher sender, DeviceInformation args) =>
-            {
-                if (args.Name.IndexOf("Muse") < 0)
-                    return;
-                devWatch.Stop();
-
-                var device = await BluetoothLEDevice.FromIdAsync(args.Id);
-                tcs.TrySetResult(device.BluetoothAddress);
-            };
-            devWatch.EnumerationCompleted += (DeviceWatcher sender, object args) =>
-            {
-                tcs.TrySetResult(null);
-                devWatch.Stop();
-            };
-            devWatch.Start();
-            return tcs.Task;
         }
 
 #endif

@@ -18,7 +18,9 @@ namespace Muse.Net.Client
             devWatch.Added += (DeviceWatcher sender, DeviceInformation args) =>
             {
                 if (args.Name.IndexOf("Muse") < 0)
+                {
                     return;
+                }
 
                 count += 1;
                 foundCallback(

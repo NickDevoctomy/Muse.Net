@@ -6,6 +6,8 @@ namespace Muse.Net.Services
 {
     public interface IMuseClient
     {
+        bool Connected { get; }
+
         Task<bool> Connect(ulong deviceAddress);
         Task Disconnect();
         Task Subscribe(params Channel[] channels);
