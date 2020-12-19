@@ -47,7 +47,6 @@ namespace Muse.Net.Services
                         curRange.FromHz,
                         curRange.ToHz));
             }
-
             return ranges;
         }
      }

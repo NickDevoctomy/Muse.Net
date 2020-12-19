@@ -1,5 +1,4 @@
-﻿using Muse.Net.Client;
-using Muse.Net.Models.Enums;
+﻿using Muse.Net.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

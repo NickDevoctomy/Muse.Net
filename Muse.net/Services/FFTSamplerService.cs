@@ -1,5 +1,4 @@
-﻿using Muse.Net.Client;
-using Muse.Net.Models.Enums;
+﻿using Muse.Net.Models.Enums;
 using System;
 using System.Linq;
 
@@ -7,8 +6,9 @@ namespace Muse.Net.Services
 {
     public class FFTSamplerService : IFFTSamplerService
     {
-        private IFourierService _fourierService = new FourierService();
         private const int SAMPLESIZE = 300;
+
+        private IFourierService _fourierService = new FourierService();
 
         public bool TryGetFFTSample(
             IMuseSamplerService museSamplerService,

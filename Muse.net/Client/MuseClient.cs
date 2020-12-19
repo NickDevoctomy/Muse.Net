@@ -7,7 +7,9 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
-using Windows.Devices.Bluetooth.Advertisement;
+#if WINDOWS_UWP
+    using Windows.Devices.Bluetooth.Advertisement;
+#endif
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
