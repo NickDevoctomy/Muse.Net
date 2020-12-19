@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Muse.Net.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -9,7 +10,7 @@ using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Devices.Enumeration;
 using Windows.Foundation;
 
-namespace Harthoorn.MuseClient
+namespace Muse.Net.Client
 {
     public class MuseClient
     {
@@ -25,12 +26,10 @@ namespace Harthoorn.MuseClient
 
         private BluetoothLEDevice device;
         private GattDeviceService service;
-
         private GattCharacteristic ch_control;
         private GattCharacteristic ch_accelerometer;
         private GattCharacteristic ch_gyroscope;
         private GattCharacteristic ch_telemetry;
-
         private GattCharacteristic ch_EEG_TP9;
         private GattCharacteristic ch_EEG_AF7;
         private GattCharacteristic ch_EEG_AF8;
@@ -50,6 +49,8 @@ namespace Harthoorn.MuseClient
             return await Connect(bluetoothDeviceId.Value);
         }
 
+#if WINDOWS_UWP
+
         public async Task<bool> Connect(ulong deviceAddress)
         {
             this.Address = deviceAddress;
@@ -58,7 +59,7 @@ namespace Harthoorn.MuseClient
             if (device is null) return false;
 
             var allServicesResult = await device.GetGattServicesAsync();
-            if(allServicesResult.Status != GattCommunicationStatus.Success)
+            if (allServicesResult.Status != GattCommunicationStatus.Success)
             {
                 return false;
             }
@@ -110,6 +111,58 @@ namespace Harthoorn.MuseClient
             bleWatcher.Start();
             return tcs.Task;
         }
+
+#else
+
+        public async Task<bool> Connect(ulong deviceAddress)
+        {
+            this.Address = deviceAddress;
+            device = await BluetoothLEDevice.FromBluetoothAddressAsync(this.Address);
+
+            if (device is null) return false;
+
+            service = device.GetGattService(MuseGuid.PRIMARY_SERVICE);
+            if (service is null) return false;
+
+            ch_control = service.GetCharacteristics(MuseGuid.CONTROL).FirstOrDefault();
+            ch_accelerometer = service.GetCharacteristics(MuseGuid.ACELEROMETER).FirstOrDefault();
+            ch_gyroscope = service.GetCharacteristics(MuseGuid.GYROSCOPE).FirstOrDefault();
+            ch_telemetry = service.GetCharacteristics(MuseGuid.TELEMETRY).FirstOrDefault();
+            ch_EEG_TP9 = service.GetCharacteristics(MuseGuid.EEG_TP9).FirstOrDefault();
+            ch_EEG_AF7 = service.GetCharacteristics(MuseGuid.EEG_AF7).FirstOrDefault();
+            ch_EEG_AF8 = service.GetCharacteristics(MuseGuid.EEG_AF8).FirstOrDefault();
+            ch_EEG_TP10 = service.GetCharacteristics(MuseGuid.EEG_TP10).FirstOrDefault();
+            ch_EEG_AUX = service.GetCharacteristics(MuseGuid.EEG_AUX).FirstOrDefault();
+
+            Connected = true;
+            return true;
+        }
+
+        public static Task<ulong?> FindPairedMuseDevice()
+        {
+            string query = BluetoothLEDevice.GetDeviceSelectorFromPairingState(true);
+            var devWatch = DeviceInformation.CreateWatcher(query);
+            var tcs = new TaskCompletionSource<ulong?>();
+   
+            devWatch.Added += async (DeviceWatcher sender, DeviceInformation args) =>
+            {
+                if (args.Name.IndexOf("Muse") < 0)
+                    return;
+                devWatch.Stop();
+
+                var device = await BluetoothLEDevice.FromIdAsync(args.Id);
+                tcs.TrySetResult(device.BluetoothAddress);
+            };
+            devWatch.EnumerationCompleted += (DeviceWatcher sender, object args) =>
+            {
+                tcs.TrySetResult(null);
+                devWatch.Stop();
+            };
+            devWatch.Start();
+            return tcs.Task;
+        }
+
+#endif
 
         public async Task Disconnect()
         {
@@ -310,7 +363,8 @@ namespace Harthoorn.MuseClient
             if (ch == ch_EEG_TP10) return Channel.EEG_TP10;
             if (ch == ch_EEG_AUX) return Channel.EEG_AUX;
 
-            return Channel.None;      
+            return Channel.None;        
         }
     }
+
 }

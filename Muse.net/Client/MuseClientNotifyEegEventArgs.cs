@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Harthoorn.MuseClient
+namespace Muse.Net.Client
 {
     public class MuseClientNotifyEegEventArgs : EventArgs
     {

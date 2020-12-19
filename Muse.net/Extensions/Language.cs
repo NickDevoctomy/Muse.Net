@@ -2,11 +2,11 @@
 using System.Text;
 using Windows.Storage.Streams;
 
-namespace Harthoorn.MuseClient
+namespace Muse.Net.Extensions
 {
     public static class Language
     {
-        public static IBuffer EncodeCommand(string command)
+        public static IBuffer EncodeCommandAsBuffer(this string command)
         {
             string text = $"X{command}\n";
             var bytes = Encoding.UTF8.GetBytes(text);

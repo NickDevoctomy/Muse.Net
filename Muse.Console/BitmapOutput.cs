@@ -4,6 +4,7 @@ using Harthoorn.MuseClient;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Threading;
+using Muse.Net.Client;
 
 namespace ConsoleApp
 {

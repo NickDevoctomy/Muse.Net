@@ -1,4 +1,4 @@
-﻿using Harthoorn.MuseClient;
+﻿using Muse.Net.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;

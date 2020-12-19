@@ -120,32 +120,88 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Gatt\CharacteristicExtensions.cs" />
-    <Compile Include="Gatt\Language.cs" />
-    <Compile Include="Muse\Channel.cs" />
-    <Compile Include="Muse\Command.cs" />
-    <Compile Include="Muse\Models.cs" />
-    <Compile Include="Muse\MuseClient.cs" />
-    <Compile Include="Muse\MuseClientNotifyEegEventArgs.cs" />
-    <Compile Include="Muse\MuseGuid.cs" />
-    <Compile Include="Muse\Parse.cs" />
-    <Compile Include="Muse\Scale.cs" />
+    <Compile Include="..\Muse.net\Client\Accelerometer.cs">
+      <Link>Client\Accelerometer.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Encefalogram.cs">
+      <Link>Client\Encefalogram.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Gyroscope.cs">
+      <Link>Client\Gyroscope.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Telemetry.cs">
+      <Link>Client\Telemetry.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Vector.cs">
+      <Link>Client\Vector.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Extensions\CharacteristicExtensions.cs">
+      <Link>Extensions\CharacteristicExtensions.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Extensions\Language.cs">
+      <Link>Extensions\Language.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Channel.cs">
+      <Link>Client\Channel.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Command.cs">
+      <Link>Client\Command.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\MuseClient.cs">
+      <Link>Client\MuseClient.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\MuseClientNotifyEegEventArgs.cs">
+      <Link>Client\MuseClientNotifyEegEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\MuseGuid.cs">
+      <Link>Client\MuseGuid.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Parse.cs">
+      <Link>Client\Parse.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\Scale.cs">
+      <Link>Client\Scale.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\BrainFrequencyAnalyser.cs">
+      <Link>Services\BrainFrequencyAnalyser.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\FFTSamplerService.cs">
+      <Link>Services\FFTSamplerService.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\FourierService.cs">
+      <Link>Services\FourierService.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\FrequencyRange.cs">
+      <Link>Services\FrequencyRange.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\FrequencyRangeGroup.cs">
+      <Link>Services\FrequencyRangeGroup.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\FrequencyRanges.cs">
+      <Link>Services\FrequencyRanges.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\IBrainFrequencyAnalyser.cs">
+      <Link>Services\IBrainFrequencyAnalyser.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\IFFTSamplerService.cs">
+      <Link>Services\IFFTSamplerService.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\IFourierService.cs">
+      <Link>Services\IFourierService.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\IMuseSamplerService.cs">
+      <Link>Services\IMuseSamplerService.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\MuseSamplerService.cs">
+      <Link>Services\MuseSamplerService.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\MuseSamplerServiceConfiguration.cs">
+      <Link>Services\MuseSamplerServiceConfiguration.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Services\RawSamplePacket.cs">
+      <Link>Services\RawSamplePacket.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Services\BrainFrequencyAnalyser.cs" />
-    <Compile Include="Services\FFTSamplerService.cs" />
-    <Compile Include="Services\FourierService.cs" />
-    <Compile Include="Services\FrequencyRange.cs" />
-    <Compile Include="Services\FrequencyRangeGroup.cs" />
-    <Compile Include="Services\FrequencyRanges.cs" />
-    <Compile Include="Services\IBrainFrequencyAnalyser.cs" />
-    <Compile Include="Services\IFFTSamplerService.cs" />
-    <Compile Include="Services\IFourierService.cs" />
-    <Compile Include="Services\IMuseSamplerService.cs" />
-    <Compile Include="Services\IPlotterService.cs" />
-    <Compile Include="Services\MuseSamplerService.cs" />
-    <Compile Include="Services\MuseSamplerServiceConfiguration.cs" />
-    <Compile Include="Services\PlotterService.cs" />
-    <Compile Include="Services\RawSamplePacket.cs" />
     <EmbeddedResource Include="Properties\Muse.Net.Uwp.rd.xml" />
   </ItemGroup>
   <ItemGroup>

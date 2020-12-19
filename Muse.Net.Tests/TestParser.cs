@@ -1,5 +1,5 @@
-using Harthoorn.MuseClient;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Muse.Net.Client;
 
 namespace BluetoothCore
 {

@@ -1,4 +1,4 @@
-﻿namespace Harthoorn.MuseClient
+﻿namespace Muse.Net.Client
 {
     public static class Scale
     {

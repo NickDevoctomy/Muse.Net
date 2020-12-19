@@ -1,9 +1,8 @@
-﻿using Harthoorn.MuseClient;
+﻿using Muse.Net.Client;
 using Muse.Net.Services;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace Muse.LiveFeed
