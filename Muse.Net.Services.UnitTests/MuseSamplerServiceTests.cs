@@ -31,6 +31,58 @@ namespace Muse.Net.Services.UnitTests
         }
 
         [Fact]
+        public void GivenSample10Values_WhenGetSampleCountForLastSecondForAnotherChannel_Then0Returned()
+        {
+            // Arrange
+            var config = new MuseSamplerServiceConfiguration
+            {
+                SamplePeriod = new System.TimeSpan(0, 0, 10)
+            };
+            var sut = new MuseSamplerService(config);
+            var sampleChannel = Channel.EEG_AF7;
+            var countChannel = Channel.EEG_AF8;
+            var values = new float[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            sut.Sample(
+                sampleChannel,
+                values);
+
+            // Act
+            var result = sut.GetSampleCount(
+                    countChannel,
+                    new System.TimeSpan(0, 0, 1));
+
+            // Assert
+            Assert.Equal(0, result);
+        }
+
+        [Fact]
+        public void GivenSample10Values_WhenTryGetSamplesForLastSecondForAnotherChannel_ThenReturnedFalse_AndNullSamplesReturned()
+        {
+            // Arrange
+            var config = new MuseSamplerServiceConfiguration
+            {
+                SamplePeriod = new System.TimeSpan(0, 0, 10)
+            };
+            var sut = new MuseSamplerService(config);
+            var sampleChannel = Channel.EEG_AF7;
+            var countChannel = Channel.EEG_AF8;
+            var values = new float[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+            sut.Sample(
+                sampleChannel,
+                values);
+
+            // Act
+            var gotSamples = sut.TryGetSamples(
+                countChannel,
+                new System.TimeSpan(0, 0, 1),
+                out var samples);
+
+            // Assert
+            Assert.False(gotSamples);
+            Assert.Null(samples);
+        }
+
+        [Fact]
         public async Task GivenSample10Values_AndWait2Seconds_WhenGetSampleCountForLastSecond_Then0Returned()
         {
             // Arrange
@@ -110,7 +162,7 @@ namespace Muse.Net.Services.UnitTests
         }
 
         [Fact]
-        public async Task GivenSamplePeriodOf1Second_AndSample10Values_AndWait2Seconds_AndSample1Value_WheTryGetSamplesForLast5Seconds_Then1SamplesReturned()
+        public async Task GivenSamplePeriodOf1Second_AndSample10Values_AndWait2Seconds_AndSample1Value_WhenTryGetSamplesForLast5Seconds_Then1SamplesReturned()
         {
             // Arrange
             var config = new MuseSamplerServiceConfiguration
