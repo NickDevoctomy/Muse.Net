@@ -1,4 +1,5 @@
 ﻿using Muse.Net.Client;
+using Muse.Net.Models.Enums;
 using System;
 
 namespace Muse.Net.Services

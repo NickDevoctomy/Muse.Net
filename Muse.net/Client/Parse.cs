@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Muse.Net.Models;
+using System;
 using System.Buffers.Binary;
 
 namespace Muse.Net.Client

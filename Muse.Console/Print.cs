@@ -1,4 +1,4 @@
-﻿using Muse.Net.Client;
+﻿using Muse.Net.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;

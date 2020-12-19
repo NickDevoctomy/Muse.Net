@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Harthoorn.MuseClient;
 using Muse.Net.Client;
+using Muse.Net.Models;
 using Shell.Routing;
 
 namespace ConsoleApp

@@ -120,29 +120,11 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Muse.net\Client\Accelerometer.cs">
-      <Link>Client\Accelerometer.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Client\Encefalogram.cs">
-      <Link>Client\Encefalogram.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Client\Gyroscope.cs">
-      <Link>Client\Gyroscope.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Client\Telemetry.cs">
-      <Link>Client\Telemetry.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Client\Vector.cs">
-      <Link>Client\Vector.cs</Link>
-    </Compile>
     <Compile Include="..\Muse.net\Extensions\CharacteristicExtensions.cs">
       <Link>Extensions\CharacteristicExtensions.cs</Link>
     </Compile>
     <Compile Include="..\Muse.net\Extensions\Language.cs">
       <Link>Extensions\Language.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Client\Channel.cs">
-      <Link>Client\Channel.cs</Link>
     </Compile>
     <Compile Include="..\Muse.net\Client\Command.cs">
       <Link>Client\Command.cs</Link>
@@ -211,6 +193,12 @@
     <PackageReference Include="System.Memory">
       <Version>4.5.1</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Muse.Net.Models\Muse.Net.Models.csproj">
+      <Project>{c7a868d5-e606-4cec-be22-cfa3c47bf169}</Project>
+      <Name>Muse.Net.Models</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

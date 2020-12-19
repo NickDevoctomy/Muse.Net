@@ -1,4 +1,4 @@
-﻿namespace Muse.Net.Client
+﻿namespace Muse.Net.Models.Enums
 {
     public enum Channel
     {

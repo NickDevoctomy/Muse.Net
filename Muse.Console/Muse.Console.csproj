@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Shell.Routing" Version="1.0.0" />
+    <ProjectReference Include="..\Muse.Net.Models\Muse.Net.Models.csproj" />
     <ProjectReference Include="..\Muse.Net\Muse.Net.csproj" />
   </ItemGroup>
 

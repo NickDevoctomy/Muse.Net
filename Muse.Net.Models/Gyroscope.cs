@@ -1,6 +1,6 @@
-﻿namespace Muse.Net.Client
+﻿namespace Muse.Net.Models
 {
-    public class Accelerometer
+    public class Gyroscope
     {
         public ushort SequenceId;
         public Vector[] Samples;
