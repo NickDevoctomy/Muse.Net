@@ -53,7 +53,7 @@ namespace Muse.Net.Services.UnitTests
         public void GivenData_WhenDFT_ThenCorrectValuesReturned()
         {
             // Arrange
-            var data = new System.ReadOnlySpan<float>(new float[]
+            var data = new float[]
             {
                 2986,
                 529,
@@ -67,7 +67,7 @@ namespace Muse.Net.Services.UnitTests
                 1101,
                 3613,
                 179
-            });
+            };
             var expectedResults = new Complex[]
                 {
                     new Complex(20750, 0),

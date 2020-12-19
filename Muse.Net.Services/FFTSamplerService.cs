@@ -10,6 +10,11 @@ namespace Muse.Net.Services
 
         private IFourierService _fourierService = new FourierService();
 
+        public FFTSamplerService(IFourierService fourierService)
+        {
+            _fourierService = fourierService;
+        }
+
         public bool TryGetFFTSample(
             IMuseSamplerService museSamplerService,
             Channel channel,

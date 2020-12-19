@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Muse.Net.Models;
+using System;
 
 namespace Muse.Net.Services
 {

@@ -24,10 +24,11 @@ namespace Muse.LiveFeed
             public bool ShowFFTRange;
         }
 
-        private readonly MuseSamplerService _museSamplerService;
-        private readonly FFTSamplerService _fftSamplerService;
-        private readonly PlotterService _plotterService;
-        private readonly BrainFrequencyAnalyser _bainFrequencyAnalyser;
+        private readonly IMuseSamplerService _museSamplerService;
+        private readonly IFourierService _fourierService;
+        private readonly IFFTSamplerService _fftSamplerService;
+        private readonly IPlotterService _plotterService;
+        private readonly IBrainFrequencyAnalyser _bainFrequencyAnalyser;
 
         Bitmap _bitmapBuffer;
         Graphics _graphicsBuffer;
@@ -113,7 +114,8 @@ namespace Muse.LiveFeed
                 {
                     SamplePeriod = PLOTPERIOD
                 });
-            _fftSamplerService = new FFTSamplerService();
+            _fourierService = new FourierService();
+            _fftSamplerService = new FFTSamplerService(_fourierService);
             _plotterService = new PlotterService();
             _bainFrequencyAnalyser = new BrainFrequencyAnalyser();
 

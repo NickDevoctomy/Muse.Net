@@ -5,7 +5,7 @@ namespace Muse.Net.Services
 {
     public class FourierService : IFourierService
     {
-        public Complex[] DFT(ReadOnlySpan<float> data)
+        public Complex[] DFT(float[] data)
         {
             double pi2oN = -2.0 * Math.PI / data.Length;
             Complex[] frequencies = new Complex[data.Length];
