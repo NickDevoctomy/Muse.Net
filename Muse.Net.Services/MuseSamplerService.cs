@@ -78,6 +78,28 @@ namespace Muse.Net.Services
             return false;
         }
 
+        public int GetSampleCount(
+            Channel channel,
+            TimeSpan timeSpan)
+        {
+            lock (_lock)
+            {
+                var cutOffPoint = DateTime.UtcNow - timeSpan;
+                var rawSamples = default(List<RawSamplePacket>);
+                if (_samples.TryGetValue(
+                    channel,
+                    out rawSamples))
+                {
+                    if (_samples.Any())
+                    {
+                        return rawSamples.Where(x => x.DateTime > cutOffPoint).SelectMany(y => y.Values).Count();
+                    }
+                }
+            }
+
+            return 0;
+        }
+
         private void TrimSamplePeriod(TimeSpan timeSpan)
         {
             var cutOffPoint = DateTime.UtcNow - timeSpan;

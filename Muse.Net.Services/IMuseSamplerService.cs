@@ -13,5 +13,9 @@ namespace Muse.Net.Services
             Channel channel,
             TimeSpan timeSpan,
             out float[] samples);
+
+        int GetSampleCount(
+            Channel channel,
+            TimeSpan timeSpan);
     }
 }

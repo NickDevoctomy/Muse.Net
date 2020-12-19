@@ -1,4 +1,5 @@
-﻿using Harthoorn.MuseClient;
+﻿using Muse.Net.Client;
+using Muse.Net.Models.Enums;
 using Muse.Net.Services;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;

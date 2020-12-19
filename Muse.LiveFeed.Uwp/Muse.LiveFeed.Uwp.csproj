@@ -155,6 +155,14 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Muse.Net.Models\Muse.Net.Models.csproj">
+      <Project>{c7a868d5-e606-4cec-be22-cfa3c47bf169}</Project>
+      <Name>Muse.Net.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Muse.Net.Services\Muse.Net.Services.csproj">
+      <Project>{a9af9de0-ecd8-4694-a067-cf89e53460f1}</Project>
+      <Name>Muse.Net.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Muse.Net.Uwp\Muse.Net.Uwp.csproj">
       <Project>{0242cfc9-7a06-4e8d-8ce2-287037ce61fb}</Project>
       <Name>Muse.Net.Uwp</Name>
