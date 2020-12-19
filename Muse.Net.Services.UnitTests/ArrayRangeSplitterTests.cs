@@ -22,7 +22,7 @@ namespace Muse.Net.Services.UnitTests
         {
             // Arrange
             var sourceArray = new int[sourceArraySize];
-            var sut = new ArrayRangeSplitter();
+            var sut = new ProportionalArrayRangeSplitter();
 
             // Act
             var result = sut.SplitRange(

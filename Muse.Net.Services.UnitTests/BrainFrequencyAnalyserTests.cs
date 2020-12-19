@@ -11,7 +11,7 @@ namespace Muse.Net.Services.UnitTests
 
         [Theory]
         [InlineData(new float[] { 1f, 4f, 2f, 3f, 4f, 5f, 6f, 9f, 7f, 2f }, 100f, 20f, 50f, 3f)]
-        [InlineData(new float[] { 10f, 10f, 10f, 10f, 10f, 10f, 10f, 10f, 10f, 10f }, 100f, 0f, 100f, 10f)]
+        [InlineData(new float[] { 1f, 2f, 3f, 4f, 5f, 6f, 7f, 8f, 9f, 10f }, 100f, 0f, 100f, 6f)]
         public void GivenData_AndCount_AndMaxFrequencyHz_AndFromHz_AndToHz_WhenGetAverageOverRange_ThenCorrectValueReturned(
             float[] data,
             float maxFrequencyHz,
@@ -37,7 +37,6 @@ namespace Muse.Net.Services.UnitTests
 
         [Theory]
         [InlineData(new float[] { 100, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5 }, 62f, "Delta:1,Theta:2,Alpha:3,Beta:4,Gamma:5")]
-
         public void GivenData_AndMaxFrequencyHz_WhenGetFrequencyRangeAverages_ThenCorrectAveragesReturned(
             float[] data,
             float maxFrequencyHz,
