@@ -7,6 +7,8 @@ namespace Muse.Net.Services
 {
     public class BrainFrequencyAnalyser : IBrainFrequencyAnalyser
     {
+        private IArrayRangeSplitter _arrayRangeSplitter = new ArrayRangeSplitter();
+
         public float GetAverageOverRange(
             float[] data,
             float count,
@@ -14,12 +16,19 @@ namespace Muse.Net.Services
             float fromHz,
             float toHz)
         {
-            double freqPerIndex = (double)maxFrequencyHz / (double)count;
-            int fromIndex = (int)Math.Floor((double)fromHz / freqPerIndex) + 1;
-            int toIndex = (int)Math.Ceiling((double)toHz / freqPerIndex);
-            int destSize = toIndex - fromIndex;
+            var range = _arrayRangeSplitter.SplitRange(
+                data,
+                fromHz,
+                toHz,
+                maxFrequencyHz);
+            if(range.From == 0)
+            {
+                range.From = 1;
+            }
+
+            int destSize = range.To - range.From;
             var destArray = new float[destSize];
-            Array.Copy(data, fromIndex, destArray, 0, destArray.Length);
+            Array.Copy(data, range.From, destArray, 0, destArray.Length);
             return destArray.Average();
         }
 
