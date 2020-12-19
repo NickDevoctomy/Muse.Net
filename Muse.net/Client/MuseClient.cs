@@ -14,10 +14,11 @@ using Windows.Devices.Bluetooth;
 #endif
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
+using Muse.Net.Services;
 
 namespace Muse.Net.Client
 {
-    public class MuseClient
+    public class MuseClient : IMuseClient
     {
         public event EventHandler<MuseClientNotifyTelemetryEventArgs> NotifyTelemetry;
         public event EventHandler<MuseClientNotifyAccelerometerEventArgs> NotifyAccelerometer;

@@ -153,6 +153,7 @@
     <Compile Include="..\Muse.net\Client\Scale.cs">
       <Link>Client\Scale.cs</Link>
     </Compile>
+    <Compile Include="Client\UwpMuseDeviceDiscoveryService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Muse.Net.Uwp.rd.xml" />
   </ItemGroup>
@@ -168,6 +169,10 @@
     <ProjectReference Include="..\Muse.Net.Models\Muse.Net.Models.csproj">
       <Project>{c7a868d5-e606-4cec-be22-cfa3c47bf169}</Project>
       <Name>Muse.Net.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Muse.Net.Services\Muse.Net.Services.csproj">
+      <Project>{a9af9de0-ecd8-4694-a067-cf89e53460f1}</Project>
+      <Name>Muse.Net.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

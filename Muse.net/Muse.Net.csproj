@@ -35,6 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Muse.Net.Models\Muse.Net.Models.csproj" />
+    <ProjectReference Include="..\Muse.Net.Services\Muse.Net.Services.csproj" />
   </ItemGroup>
 
 
