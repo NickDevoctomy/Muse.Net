@@ -116,7 +116,9 @@ namespace Muse.Net.Services
                         if (last != null)
                         {
                             var lastIndex = rawSamples.IndexOf(last);
-                            rawSamples.RemoveRange(0, lastIndex + 1);
+                            rawSamples.RemoveRange(
+                                0,
+                                lastIndex + 1);
                         }
                     }
                 }

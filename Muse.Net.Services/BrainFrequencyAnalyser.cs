@@ -28,7 +28,12 @@ namespace Muse.Net.Services
 
             int destSize = range.To - range.From;
             var destArray = new float[destSize];
-            Array.Copy(data, range.From, destArray, 0, destArray.Length);
+            Array.Copy(
+                data,
+                range.From,
+                destArray,
+                0,
+                destArray.Length);
             return destArray.Average();
         }
 
