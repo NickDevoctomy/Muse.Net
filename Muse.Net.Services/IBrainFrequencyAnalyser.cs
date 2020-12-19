@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Muse.Net.Model;
+using System.Collections.Generic;
 
 namespace Muse.Net.Services
 {

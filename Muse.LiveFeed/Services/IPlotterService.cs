@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Muse.Net.Model;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace Muse.Net.Services

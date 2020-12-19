@@ -144,45 +144,6 @@
     <Compile Include="..\Muse.net\Client\Scale.cs">
       <Link>Client\Scale.cs</Link>
     </Compile>
-    <Compile Include="..\Muse.net\Services\BrainFrequencyAnalyser.cs">
-      <Link>Services\BrainFrequencyAnalyser.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\FFTSamplerService.cs">
-      <Link>Services\FFTSamplerService.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\FourierService.cs">
-      <Link>Services\FourierService.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\FrequencyRange.cs">
-      <Link>Services\FrequencyRange.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\FrequencyRangeGroup.cs">
-      <Link>Services\FrequencyRangeGroup.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\FrequencyRanges.cs">
-      <Link>Services\FrequencyRanges.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\IBrainFrequencyAnalyser.cs">
-      <Link>Services\IBrainFrequencyAnalyser.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\IFFTSamplerService.cs">
-      <Link>Services\IFFTSamplerService.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\IFourierService.cs">
-      <Link>Services\IFourierService.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\IMuseSamplerService.cs">
-      <Link>Services\IMuseSamplerService.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\MuseSamplerService.cs">
-      <Link>Services\MuseSamplerService.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\MuseSamplerServiceConfiguration.cs">
-      <Link>Services\MuseSamplerServiceConfiguration.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Services\RawSamplePacket.cs">
-      <Link>Services\RawSamplePacket.cs</Link>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <EmbeddedResource Include="Properties\Muse.Net.Uwp.rd.xml" />
   </ItemGroup>

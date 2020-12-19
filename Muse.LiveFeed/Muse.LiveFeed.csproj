@@ -56,6 +56,8 @@
     <Compile Include="MyMuse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\IPlotterService.cs" />
+    <Compile Include="Services\PlotterService.cs" />
     <Compile Include="SpeedGraph.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -85,6 +87,14 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Muse.Net.Models\Muse.Net.Models.csproj">
+      <Project>{c7a868d5-e606-4cec-be22-cfa3c47bf169}</Project>
+      <Name>Muse.Net.Models</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Muse.Net.Services\Muse.Net.Services.csproj">
+      <Project>{a9af9de0-ecd8-4694-a067-cf89e53460f1}</Project>
+      <Name>Muse.Net.Services</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Muse.Net\Muse.Net.csproj">
       <Project>{83fba32b-1ac2-4f0d-b932-283acf79dd42}</Project>
       <Name>Muse.Net</Name>

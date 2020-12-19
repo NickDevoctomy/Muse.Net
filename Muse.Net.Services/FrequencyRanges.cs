@@ -1,4 +1,7 @@
-﻿namespace Muse.Net.Services
+﻿using Muse.Net.Model;
+using Muse.Net.Models.Enums;
+
+namespace Muse.Net.Services
 {
     public static class FrequencyRanges
     {

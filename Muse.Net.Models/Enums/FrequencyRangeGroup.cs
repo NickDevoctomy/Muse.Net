@@ -1,4 +1,4 @@
-﻿namespace Muse.Net.Services
+﻿namespace Muse.Net.Models.Enums
 {
     public enum FrequencyRangeGroup
     {
