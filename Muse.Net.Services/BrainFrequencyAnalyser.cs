@@ -15,13 +15,18 @@ namespace Muse.Net.Services
             float toHz)
         {
             double freqPerIndex = (double)maxFrequencyHz / (double)count;
-            int fromIndex = (int)Math.Floor((double)fromHz / freqPerIndex);
-            if (fromIndex == 0)
+            int fromIndex = (int)Math.Floor((double)fromHz / freqPerIndex) - 1;
+            if (fromIndex <= 0)
             {
                 fromIndex = 1;
             }
-            int toIndex = (int)Math.Ceiling((double)toHz / freqPerIndex);
-            var destArray = new float[toIndex - fromIndex];
+            int toIndex = (int)Math.Ceiling((double)toHz / freqPerIndex) - 1;
+            int destSize = toIndex - fromIndex;
+            if(destSize <= 0)
+            {
+                destSize = 1;
+            }
+            var destArray = new float[destSize];
             Array.Copy(data, fromIndex, destArray, 0, destArray.Length);
             return destArray.Average();
         }
