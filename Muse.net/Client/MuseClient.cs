@@ -9,18 +9,19 @@ using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 #if WINDOWS_UWP
     using Windows.Devices.Bluetooth.Advertisement;
+#else
+    using Windows.Devices.Enumeration;
 #endif
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Devices.Enumeration;
 using Windows.Foundation;
 
 namespace Muse.Net.Client
 {
     public class MuseClient
     {
-        public event Action<Telemetry> NotifyTelemetry;
-        public event Action<Accelerometer> NotifyAccelerometer;
-        public event Action<Gyroscope> NotifyGyroscope;
+        public event EventHandler<MuseClientNotifyTelemetryEventArgs> NotifyTelemetry;
+        public event EventHandler<MuseClientNotifyAccelerometerEventArgs> NotifyAccelerometer;
+        public event EventHandler<MuseClientNotifyGyroscopeEventArgs> NotifyGyroscope;
         public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
 
         public string Name { get; private set; }
@@ -235,7 +236,9 @@ namespace Muse.Net.Client
             return ok;
         }
 
-        private void Notify(GattCharacteristic sender, GattValueChangedEventArgs args)
+        private void Notify(
+            GattCharacteristic sender,
+            GattValueChangedEventArgs args)
         {
             var bytes = args.CharacteristicValue.ToArray();
             var channel = GetChannel(sender);
@@ -253,7 +256,10 @@ namespace Muse.Net.Client
             }
         }
 
-        private async Task<bool> SubscribeEvent(Channel channel, TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler)
+        private async Task<bool> SubscribeEvent(
+            Channel channel,
+            TypedEventHandler<GattCharacteristic,
+                GattValueChangedEventArgs> handler)
         {
             var characteristic = GetCharacteristic(channel);
             var descriptor = await characteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
@@ -272,7 +278,10 @@ namespace Muse.Net.Client
             return alreadyOn;
         }
 
-        private async Task UnsubscribeEvent(Channel channel, TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler, bool keepOn)
+        private async Task UnsubscribeEvent(
+            Channel channel,
+            TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler,
+            bool keepOn)
         {
             if (handler != null)
             {
@@ -314,7 +323,9 @@ namespace Muse.Net.Client
             else return null;
         }
 
-        private void TriggerNotifyEeg(Channel channel, ReadOnlySpan<byte> bytes)
+        private void TriggerNotifyEeg(
+            Channel channel,
+            ReadOnlySpan<byte> bytes)
         { 
             var eeg = Parse.Encefalogram(bytes);
             NotifyEeg?.Invoke(this, new MuseClientNotifyEegEventArgs { Channel = channel, Encefalogram = eeg });
@@ -323,19 +334,19 @@ namespace Muse.Net.Client
         private void TriggerNotifyTelemetry(ReadOnlySpan<byte> bytes)
         {
             var telemetry = Parse.Telemetry(bytes);
-            NotifyTelemetry?.Invoke(telemetry);
+            NotifyTelemetry?.Invoke(this, new MuseClientNotifyTelemetryEventArgs { Telemetry = telemetry });
         }
 
         private void TriggerNotifyAccelerometer(ReadOnlySpan<byte> bytes)
         {
             var accelerometer = Parse.Accelerometer(bytes);
-            NotifyAccelerometer?.Invoke(accelerometer);
+            NotifyAccelerometer?.Invoke(this, new MuseClientNotifyAccelerometerEventArgs { Accelerometer = accelerometer });
         }
 
         private void TriggerNotifyGyroscope(ReadOnlySpan<byte> bytes)
         {
             var gyroscope = Parse.Gyroscope(bytes);
-            NotifyGyroscope?.Invoke(gyroscope);
+            NotifyGyroscope?.Invoke(this, new MuseClientNotifyGyroscopeEventArgs { Gyroscope = gyroscope });
         }
 
         private GattCharacteristic GetCharacteristic(Channel channel)
