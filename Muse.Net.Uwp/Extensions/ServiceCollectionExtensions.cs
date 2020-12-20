@@ -9,11 +9,11 @@ namespace Muse.Net.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddMuseServices(this ServiceCollection serviceCollection)
+        public static void AddMuseServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IMuseDeviceDiscoveryService, UwpMuseDeviceDiscoveryService>();
             serviceCollection.AddScoped<IMuseDataParserService, MuseDataParserService>();
-            serviceCollection.AddScoped<IBluetoothClient<Channel, GattCharacteristic>, UwpBluetoothClient<Channel>>();
+            serviceCollection.AddScoped<IBluetoothClient<Channel, IGattCharacteristic>, UwpBluetoothClient<Channel>>();
             serviceCollection.AddScoped<IMuseClient, MuseClient>();
         }
     }

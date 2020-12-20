@@ -1,6 +1,4 @@
-﻿using Muse.Net.Client;
-using Muse.Net.Models.Enums;
-using Muse.Net.Services;
+﻿using Muse.Net.Services;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -9,18 +7,17 @@ namespace Muse.LiveFeed.Uwp
     public sealed partial class MainPage : Page
     {
         private readonly IMuseSamplerService _museSamplerService = new MuseSamplerService(new MuseSamplerServiceConfiguration { SamplePeriod = new System.TimeSpan(0, 0, 5) });
-        //private readonly IFFTSamplerService _fftSamplerService;
-        //private readonly IBrainFrequencyAnalyser _bainFrequencyAnalyser;
-        private MuseClient _museClient = new MuseClient();
+        private readonly IMuseClient _museClient;
 
         public MainPage()
         {
             this.InitializeComponent();
+            _museClient = (IMuseClient)AppServices.Instance.ServiceProvider.GetService(typeof(IMuseClient));
         }
 
-        private async void AppBarButton_Click(object sender, RoutedEventArgs e)
+        private void AppBarButton_Click(object sender, RoutedEventArgs e)
         {
-            var connected = await _museClient.Connect();
+            /*var connected = await _museClient.Connect();
             if(connected)
             {
                 await _museClient.Subscribe(
@@ -31,7 +28,7 @@ namespace Muse.LiveFeed.Uwp
 
                 _museClient.NotifyEeg += _museClient_NotifyEeg1;
                 await _museClient.Resume();
-            }
+            }*/
         }
 
         private void _museClient_NotifyEeg1(object sender, MuseClientNotifyEegEventArgs e)

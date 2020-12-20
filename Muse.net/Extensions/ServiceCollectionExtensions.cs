@@ -8,7 +8,7 @@ namespace Muse.Net.Extensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void AddMuseServices(this ServiceCollection serviceCollection)
+        public static void AddMuseServices(this IServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IMuseDeviceDiscoveryService, WindowsDesktopMuseDeviceDiscoveryService>();
             serviceCollection.AddScoped<IMuseDataParserService, MuseDataParserService>();

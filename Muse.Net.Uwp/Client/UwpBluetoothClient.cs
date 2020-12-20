@@ -11,17 +11,17 @@ using Windows.Foundation;
 
 namespace Muse.Net.Uwp.Client
 {
-    public class UwpBluetoothClient<GattCharacteristicKeyType> : IBluetoothClient<GattCharacteristicKeyType, GattCharacteristic>
+    public class UwpBluetoothClient<GattCharacteristicKeyType> : IBluetoothClient<GattCharacteristicKeyType, IGattCharacteristic>
     {
         private BluetoothLEDevice _device;
         private GattDeviceService _service;
-        private Dictionary<GattCharacteristicKeyType, GattCharacteristic> _charcteristics = new Dictionary<GattCharacteristicKeyType, GattCharacteristic>();
+        private Dictionary<GattCharacteristicKeyType, IGattCharacteristic> _characteristics = new Dictionary<GattCharacteristicKeyType, IGattCharacteristic>();
         private IList<GattCharacteristicKeyType> _subscriptions = new List<GattCharacteristicKeyType>();
 
         public string Name { get; private set; }
         public ulong Address { get; private set; }
         public bool Connected { get; private set; } = false;
-        public IReadOnlyDictionary<GattCharacteristicKeyType, GattCharacteristic> Characteristics => _charcteristics;
+        public IReadOnlyDictionary<GattCharacteristicKeyType, IGattCharacteristic> Characteristics => _characteristics;
 
         public Action<GattCharacteristicKeyType, byte[]> OnGattValueChanged { get; set; }
 
@@ -60,9 +60,9 @@ namespace Muse.Net.Uwp.Client
             foreach (var curCharacteristic in characteristics)
             {
                 var characteristic = allCharacteristics.SingleOrDefault(x => x.Uuid == curCharacteristic.Value);
-                _charcteristics.Add(
+                _characteristics.Add(
                     curCharacteristic.Key,
-                    characteristic);
+                    new WrappedGatCharacteristic(characteristic));
             }
 
             Connected = true;
@@ -71,7 +71,7 @@ namespace Muse.Net.Uwp.Client
 
         public virtual Task Disconnect()
         {
-            _charcteristics.Clear();
+            _characteristics.Clear();
             _service.Dispose();
             _service = null;
             _device.Dispose();
@@ -83,12 +83,12 @@ namespace Muse.Net.Uwp.Client
 
         public async Task<bool> SubscribeToChannel(GattCharacteristicKeyType characteristicKey)
         {
-            var characteristic = Characteristics[characteristicKey];
-            var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+            var characteristic = (WrappedGatCharacteristic)Characteristics[characteristicKey];
+            var status = await characteristic.Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
             var ok = (status == GattCommunicationStatus.Success);
             if (ok)
             {
-                characteristic.ValueChanged += GattValueChanged;
+                characteristic.Characteristic.ValueChanged += GattValueChanged;
                 _subscriptions.Add(characteristicKey);
             }
 
@@ -105,12 +105,12 @@ namespace Muse.Net.Uwp.Client
 
         public async Task<bool> UnsubscribeFromChannel(GattCharacteristicKeyType characteristicKey)
         {
-            var characteristic = Characteristics[characteristicKey];
-            var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+            var characteristic = (WrappedGatCharacteristic)Characteristics[characteristicKey];
+            var status = await characteristic.Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
             var ok = (status == GattCommunicationStatus.Success);
             if (ok)
             {
-                characteristic.ValueChanged -= GattValueChanged;
+                characteristic.Characteristic.ValueChanged -= GattValueChanged;
                 _subscriptions.Remove(characteristicKey);
             }
 
@@ -121,13 +121,13 @@ namespace Muse.Net.Uwp.Client
             GattCharacteristicKeyType characteristicKey,
             TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler)
         {
-            var characteristic = Characteristics[characteristicKey];
-            var descriptor = await characteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
+            var characteristic = (WrappedGatCharacteristic)Characteristics[characteristicKey];
+            var descriptor = await characteristic.Characteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
             bool alreadyOn = (descriptor.ClientCharacteristicConfigurationDescriptor == GattClientCharacteristicConfigurationDescriptorValue.Notify);
             bool ok;
             if (!alreadyOn)
             {
-                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
+                var status = await characteristic.Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
                 ok = status == GattCommunicationStatus.Success;
             }
             else
@@ -137,7 +137,7 @@ namespace Muse.Net.Uwp.Client
 
             if (ok)
             {
-                characteristic.ValueChanged += handler;
+                characteristic.Characteristic.ValueChanged += handler;
             }
 
             return alreadyOn;
@@ -150,10 +150,10 @@ namespace Muse.Net.Uwp.Client
         {
             if (handler != null)
             {
-                var characteristic = Characteristics[characteristicKey];
-                characteristic.ValueChanged -= handler;
+                var characteristic = (WrappedGatCharacteristic)Characteristics[characteristicKey];
+                characteristic.Characteristic.ValueChanged -= handler;
                 if (!keepOn)
-                    await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
+                    await characteristic.Characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
             }
         }
 
@@ -179,7 +179,7 @@ namespace Muse.Net.Uwp.Client
             GattCharacteristic sender,
             GattValueChangedEventArgs args)
         {
-            GattCharacteristicKeyType characteristicKeyType = Characteristics.SingleOrDefault(x => x.Value == sender).Key;
+            GattCharacteristicKeyType characteristicKeyType = Characteristics.SingleOrDefault(x => ((WrappedGatCharacteristic)x.Value).Characteristic == sender).Key;
             var data = args.CharacteristicValue.ToArray();
             if (OnGattValueChanged != null)
             {
