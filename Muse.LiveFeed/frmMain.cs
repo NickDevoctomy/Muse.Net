@@ -15,12 +15,15 @@ namespace Muse.LiveFeed
         private frmDevices _devices;
         private Task _searching;
 
-        public frmMain()
+        public frmMain(
+            IMuseDeviceDiscoveryService museDeviceDiscoveryService,
+            IMuseClient museClient)
         {
             InitializeComponent();
 
-            _museDeviceDiscoveryService = new WindowsDesktopMuseDeviceDiscoveryService();
-            _client = new MuseClient();
+            this.FormClosing += frmMain_FormClosing;
+            _museDeviceDiscoveryService = museDeviceDiscoveryService;
+            _client = museClient;
         }
 
         private void FoundMuseDevice(MuseDevice museDevice)
@@ -107,7 +110,7 @@ namespace Muse.LiveFeed
             }
         }
 
-        private async void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private async void frmMain_FormClosing(object sender, FormClosingEventArgs e)
         {
             await _client.Pause();
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Muse.Net.Client;
+using Muse.Net.Services;
+using System;
 using System.Windows.Forms;
 
 namespace Muse.LiveFeed
@@ -10,7 +13,21 @@ namespace Muse.LiveFeed
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmMain());
+
+            var services = new ServiceCollection();
+            ConfigureServices(services);
+            using (ServiceProvider serviceProvider = services.BuildServiceProvider())
+            {
+                var form1 = serviceProvider.GetRequiredService<frmMain>();
+                Application.Run(form1);
+            }
+        }
+
+        private static void ConfigureServices(ServiceCollection serviceCollection)
+        {
+            serviceCollection.AddTransient<frmMain>();
+            serviceCollection.AddScoped<IMuseDeviceDiscoveryService, WindowsDesktopMuseDeviceDiscoveryService>();
+            serviceCollection.AddScoped<IMuseClient, MuseClient>();
         }
     }
 }
