@@ -17,13 +17,12 @@ namespace Muse.Net.Services
         Task<bool> Connect(ulong deviceAddress);
         Task Disconnect();
         Task Subscribe(params Channel[] channels);
-        Task Resume();
+        Task UnsubscribeAll();
         Task Start();
         Task Pause();
-        Task UnsubscribeAll();
+        Task Resume();
         Task<bool> SubscribeToChannel(Channel channel);
         Task<bool> UnsubscribeFromChannel(Channel channel);
-        Task<byte[]> SingleChannelEventAsync(Channel channel);
         Task<Telemetry> ReadTelemetryAsync();
     }
 }

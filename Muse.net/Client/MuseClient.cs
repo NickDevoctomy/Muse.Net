@@ -1,123 +1,44 @@
 ﻿using Muse.Net.Extensions;
-using Muse.Net.Models;
 using Muse.Net.Models.Enums;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Devices.Bluetooth;
-#if WINDOWS_UWP
-    using Windows.Devices.Bluetooth.Advertisement;
-#else
-    using Windows.Devices.Enumeration;
-#endif
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
-using Windows.Foundation;
 using Muse.Net.Services;
+using Muse.Net.Models;
 
 namespace Muse.Net.Client
 {
-    public class MuseClient : IMuseClient
+    public class MuseClient : BluetoothClient<Channel>, IMuseClient
     {
         public event EventHandler<MuseClientNotifyTelemetryEventArgs> NotifyTelemetry;
         public event EventHandler<MuseClientNotifyAccelerometerEventArgs> NotifyAccelerometer;
         public event EventHandler<MuseClientNotifyGyroscopeEventArgs> NotifyGyroscope;
         public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
 
-        public string Name { get; private set; }
-        public ulong Address { get; private set; }
-        public bool Connected { get; private set; } = false;
-        public IList<Channel> Subscriptions { get; private set; } = new List<Channel>();
-
-        private BluetoothLEDevice device;
-        private GattDeviceService service;
-        private GattCharacteristic ch_control;
-        private GattCharacteristic ch_accelerometer;
-        private GattCharacteristic ch_gyroscope;
-        private GattCharacteristic ch_telemetry;
-        private GattCharacteristic ch_EEG_TP9;
-        private GattCharacteristic ch_EEG_AF7;
-        private GattCharacteristic ch_EEG_AF8;
-        private GattCharacteristic ch_EEG_TP10;
-        private GattCharacteristic ch_EEG_AUX;
-
         public MuseClient()
         {
         }
 
-#if WINDOWS_UWP
-
-        public async Task<bool> Connect(ulong deviceAddress)
+        public Task<bool> Connect(ulong deviceAddress)
         {
-            this.Address = deviceAddress;
-            device = await BluetoothLEDevice.FromBluetoothAddressAsync(this.Address);
-
-            if (device is null) return false;
-
-            var allServicesResult = await device.GetGattServicesAsync();
-            if (allServicesResult.Status != GattCommunicationStatus.Success)
-            {
-                return false;
-            }
-
-            service = allServicesResult.Services.SingleOrDefault(x => x.Uuid == MuseGuid.PRIMARY_SERVICE);
-            if (service is null) return false;
-
-            var allCharacteristicsResult = await service.GetCharacteristicsAsync();
-            if (allCharacteristicsResult.Status != GattCommunicationStatus.Success)
-            {
-                return false;
-            }
-
-            var allCharacteristics = allCharacteristicsResult.Characteristics.ToList();
-
-            ch_control = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.CONTROL);
-            ch_accelerometer = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.ACELEROMETER);
-            ch_gyroscope = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.GYROSCOPE);
-            ch_telemetry = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.TELEMETRY);
-
-            ch_EEG_TP9 = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.EEG_TP9);
-            ch_EEG_AF7 = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.EEG_AF7);
-            ch_EEG_AF8 = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.EEG_AF8);
-            ch_EEG_TP10 = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.EEG_TP10);
-            ch_EEG_AUX = allCharacteristics.SingleOrDefault(x => x.Uuid == MuseGuid.EEG_AUX);
-
-            Connected = true;
-            return true;
+            return base.Connect(
+                deviceAddress,
+                MuseGuid.PRIMARY_SERVICE,
+                new KeyValuePair<Channel, Guid>(Channel.Control, MuseGuid.CONTROL),
+                new KeyValuePair<Channel, Guid>(Channel.Accelerometer, MuseGuid.ACELEROMETER),
+                new KeyValuePair<Channel, Guid>(Channel.Gyroscope, MuseGuid.GYROSCOPE),
+                new KeyValuePair<Channel, Guid>(Channel.Telemetry, MuseGuid.TELEMETRY),
+                new KeyValuePair<Channel, Guid>(Channel.EEG_TP9, MuseGuid.EEG_TP9),
+                new KeyValuePair<Channel, Guid>(Channel.EEG_TP10, MuseGuid.EEG_TP10),
+                new KeyValuePair<Channel, Guid>(Channel.EEG_AF7, MuseGuid.EEG_AF7),
+                new KeyValuePair<Channel, Guid>(Channel.EEG_AF8, MuseGuid.EEG_AF8),
+                new KeyValuePair<Channel, Guid>(Channel.EEG_AUX, MuseGuid.EEG_AUX));
         }
 
-#else
-
-        public async Task<bool> Connect(ulong deviceAddress)
-        {
-            this.Address = deviceAddress;
-            device = await BluetoothLEDevice.FromBluetoothAddressAsync(this.Address);
-
-            if (device is null) return false;
-
-            service = device.GetGattService(MuseGuid.PRIMARY_SERVICE);
-            if (service is null) return false;
-
-            ch_control = service.GetCharacteristics(MuseGuid.CONTROL).FirstOrDefault();
-            ch_accelerometer = service.GetCharacteristics(MuseGuid.ACELEROMETER).FirstOrDefault();
-            ch_gyroscope = service.GetCharacteristics(MuseGuid.GYROSCOPE).FirstOrDefault();
-            ch_telemetry = service.GetCharacteristics(MuseGuid.TELEMETRY).FirstOrDefault();
-            ch_EEG_TP9 = service.GetCharacteristics(MuseGuid.EEG_TP9).FirstOrDefault();
-            ch_EEG_AF7 = service.GetCharacteristics(MuseGuid.EEG_AF7).FirstOrDefault();
-            ch_EEG_AF8 = service.GetCharacteristics(MuseGuid.EEG_AF8).FirstOrDefault();
-            ch_EEG_TP10 = service.GetCharacteristics(MuseGuid.EEG_TP10).FirstOrDefault();
-            ch_EEG_AUX = service.GetCharacteristics(MuseGuid.EEG_AUX).FirstOrDefault();
-
-            Connected = true;
-            return true;
-        }
-
-#endif
-
-        public async Task Disconnect()
+        public override async Task Disconnect()
         {
             await UnsubscribeAll();
+            await base.Disconnect();
         }
 
         public async Task Subscribe(params Channel[] channels)
@@ -130,18 +51,17 @@ namespace Muse.Net.Client
 
         public async Task Resume()
         {
-            await ch_control.WriteCommand(MuseCommand.RESUME);
+            await base.Characteristics[Channel.Control].WriteCommand(MuseCommand.RESUME);
         }
 
         public async Task Start()
         {
-            await ch_control.WriteCommand(MuseCommand.START);
-
+            await base.Characteristics[Channel.Control].WriteCommand(MuseCommand.START);
         }
 
         public async Task Pause()
         {
-            await ch_control.WriteCommand(MuseCommand.PAUSE);
+            await base.Characteristics[Channel.Control].WriteCommand(MuseCommand.PAUSE);
         }
 
         public async Task UnsubscribeAll()
@@ -152,110 +72,30 @@ namespace Muse.Net.Client
             }
         }
 
-        public async Task<bool> SubscribeToChannel(Channel channel)
+        public override Task<bool> SubscribeToChannel(Channel channel)
         {
-            var characteristic = GetCharacteristic(channel);
-            var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
-            var ok = (status == GattCommunicationStatus.Success);
-
-            if (ok)
-            {
-                characteristic.ValueChanged += Notify;
-                Subscriptions.Add(channel);
-            }
-
-            return ok;
+            return base.SubscribeToChannel(channel);
         }
 
-        public async Task<bool> UnsubscribeFromChannel(Channel channel)
+        public override Task<bool> UnsubscribeFromChannel(Channel channel)
         {
-            var characteristic = GetCharacteristic(channel);
-            var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
-            var ok = (status == GattCommunicationStatus.Success);
-
-            if (ok)
-            {
-                characteristic.ValueChanged -= Notify;
-                Subscriptions.Remove(channel);
-            }
-
-            return ok;
+            return base.UnsubscribeFromChannel(channel);
         }
 
-        private void Notify(
-            GattCharacteristic sender,
-            GattValueChangedEventArgs args)
+        protected override void OnGattValueChanged(
+            Channel characteristicKeyType,
+            byte[] data)
         {
-            var bytes = args.CharacteristicValue.ToArray();
-            var channel = GetChannel(sender);
-            switch (channel)
+            switch (characteristicKeyType)
             {
-                case Channel.Telemetry: TriggerNotifyTelemetry(bytes); break;
-                case Channel.Accelerometer: TriggerNotifyAccelerometer(bytes); break;
-                case Channel.Gyroscope: TriggerNotifyGyroscope(bytes); break;
+                case Channel.Telemetry: TriggerNotifyTelemetry(data); break;
+                case Channel.Accelerometer: TriggerNotifyAccelerometer(data); break;
+                case Channel.Gyroscope: TriggerNotifyGyroscope(data); break;
                 case Channel.EEG_AF7:
                 case Channel.EEG_AF8:
                 case Channel.EEG_TP9:
                 case Channel.EEG_TP10:
-                case Channel.EEG_AUX: TriggerNotifyEeg(channel, bytes); break;
-
-            }
-        }
-
-        private async Task<bool> SubscribeEvent(
-            Channel channel,
-            TypedEventHandler<GattCharacteristic,
-                GattValueChangedEventArgs> handler)
-        {
-            var characteristic = GetCharacteristic(channel);
-            var descriptor = await characteristic.ReadClientCharacteristicConfigurationDescriptorAsync();
-            bool alreadyOn = (descriptor.ClientCharacteristicConfigurationDescriptor == GattClientCharacteristicConfigurationDescriptorValue.Notify);
-            bool ok;
-
-            if (!alreadyOn)
-            {
-                var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
-                ok = status == GattCommunicationStatus.Success;
-            }
-            else ok = true;
-
-            if (ok) characteristic.ValueChanged += handler;
-
-            return alreadyOn;
-        }
-
-        private async Task UnsubscribeEvent(
-            Channel channel,
-            TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler,
-            bool keepOn)
-        {
-            if (handler != null)
-            {
-                var characteristic = GetCharacteristic(channel);
-                characteristic.ValueChanged -= handler;
-                if (!keepOn)
-                    await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
-                
-            }
-        }
-
-        public async Task<byte[]> SingleChannelEventAsync(Channel channel)
-        {
-            var completion = new TaskCompletionSource<byte[]>();
-
-            bool keep = await SubscribeEvent(channel, NotifyTaskCompletion);
-
-            var result = await completion.Task;
-
-            await UnsubscribeEvent(channel, NotifyTaskCompletion, keep);
-
-            return result;
-
-
-            void NotifyTaskCompletion(GattCharacteristic sender, GattValueChangedEventArgs args)
-            {
-                var bytes = args.CharacteristicValue.ToArray();
-                completion.SetResult(bytes);
+                case Channel.EEG_AUX: TriggerNotifyEeg(characteristicKeyType, data); break;
             }
         }
 
@@ -294,38 +134,5 @@ namespace Muse.Net.Client
             var gyroscope = Parse.Gyroscope(bytes);
             NotifyGyroscope?.Invoke(this, new MuseClientNotifyGyroscopeEventArgs { Gyroscope = gyroscope });
         }
-
-        private GattCharacteristic GetCharacteristic(Channel channel)
-        {
-            switch (channel)
-            {
-                case Channel.Accelerometer: return ch_accelerometer;
-                case Channel.Control: return ch_control;
-                case Channel.Gyroscope: return ch_gyroscope;
-                case Channel.Telemetry: return ch_telemetry;
-                case Channel.EEG_AF7: return ch_EEG_AF7;
-                case Channel.EEG_AF8: return ch_EEG_AF8;
-                case Channel.EEG_TP9: return ch_EEG_TP9;
-                case Channel.EEG_TP10: return ch_EEG_TP10;
-                case Channel.EEG_AUX: return ch_EEG_AUX;
-                default: return null;
-            }
-        }
-
-        private Channel GetChannel(GattCharacteristic ch) 
-        {
-            if (ch == ch_control) return Channel.Control;
-            if (ch == ch_accelerometer) return Channel.Accelerometer;
-            if (ch == ch_telemetry) return Channel.Telemetry;
-            if (ch == ch_gyroscope) return Channel.Gyroscope;
-            if (ch == ch_EEG_AF7) return Channel.EEG_AF7;
-            if (ch == ch_EEG_AF8) return Channel.EEG_AF8;
-            if (ch == ch_EEG_TP9) return Channel.EEG_TP9;
-            if (ch == ch_EEG_TP10) return Channel.EEG_TP10;
-            if (ch == ch_EEG_AUX) return Channel.EEG_AUX;
-
-            return Channel.None;        
-        }
     }
-
 }

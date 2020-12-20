@@ -120,6 +120,9 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Muse.net\Client\BluetoothClient.cs">
+      <Link>Client\BluetoothClient.cs</Link>
+    </Compile>
     <Compile Include="..\Muse.net\Extensions\CharacteristicExtensions.cs">
       <Link>Extensions\CharacteristicExtensions.cs</Link>
     </Compile>

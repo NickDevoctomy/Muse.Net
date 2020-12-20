@@ -59,7 +59,7 @@ namespace ConsoleApp
             await client.Resume();
 
             Console.WriteLine("\rWaiting for signal...");
-            var telemetry = await client.ReadTelemetryAsync();
+            var telemetry = new Telemetry(); //await client.ReadTelemetryAsync();
             
             await client.Disconnect();
             return telemetry;
