@@ -141,12 +141,6 @@
     <Compile Include="..\Muse.net\Client\MuseGuid.cs">
       <Link>Client\MuseGuid.cs</Link>
     </Compile>
-    <Compile Include="..\Muse.net\Client\Parse.cs">
-      <Link>Client\Parse.cs</Link>
-    </Compile>
-    <Compile Include="..\Muse.net\Client\Scale.cs">
-      <Link>Client\Scale.cs</Link>
-    </Compile>
     <Compile Include="Client\UwpBluetoothClient.cs" />
     <Compile Include="Client\UwpMuseDeviceDiscoveryService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

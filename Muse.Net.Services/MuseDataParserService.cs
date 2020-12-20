@@ -2,11 +2,11 @@
 using System;
 using System.Buffers.Binary;
 
-namespace Muse.Net.Client
+namespace Muse.Net.Services
 {
-    public static class Parse
+    public class MuseDataParserService : IMuseDataParserService
     {
-        public static Telemetry Telemetry(ReadOnlySpan<byte> span)
+        public Telemetry Telemetry(ReadOnlySpan<byte> span)
         {
             return new Telemetry
             {
@@ -17,8 +17,8 @@ namespace Muse.Net.Client
             };
         }
 
-        public static Gyroscope Gyroscope(ReadOnlySpan<byte> span)
-        { 
+        public Gyroscope Gyroscope(ReadOnlySpan<byte> span)
+        {
             return new Gyroscope
             {
                 SequenceId = UShort(span, 0),
@@ -26,7 +26,7 @@ namespace Muse.Net.Client
             };
         }
 
-        public static Accelerometer Accelerometer(ReadOnlySpan<byte> span)
+        public Accelerometer Accelerometer(ReadOnlySpan<byte> span)
         {
             return new Accelerometer
             {
@@ -35,7 +35,7 @@ namespace Muse.Net.Client
             };
         }
 
-        public static Encefalogram Encefalogram(ReadOnlySpan<byte> span)
+        public Encefalogram Encefalogram(ReadOnlySpan<byte> span)
         {
             var samples = EegSamples(span.Slice(2));
             return new Encefalogram
@@ -47,7 +47,7 @@ namespace Muse.Net.Client
             };
         }
 
-        public static float[] EegSamples(ReadOnlySpan<byte> span)
+        public float[] EegSamples(ReadOnlySpan<byte> span)
         {
             var len = span.Length * 2 / 3;
             float[] samples = new float[len];
@@ -71,24 +71,24 @@ namespace Muse.Net.Client
             return samples;
         }
 
-        public static void ScaleEeg(float[] samples)
+        public void ScaleEeg(float[] samples)
         {
             for (int i = 0; i < samples.Length; i++)
             {
-                samples[i] = Scale.EEG * (samples[i] - Scale.EEG_OFSET); 
+                samples[i] = Scale.EEG * (samples[i] - Scale.EEG_OFSET);
             }
-        }    
+        }
 
-        public static Vector[] Samples(ReadOnlySpan<byte> span, int count, float scale)
+        public Vector[] Samples(ReadOnlySpan<byte> span, int count, float scale)
         {
             var samples = new Vector[3];
             for (int i = 0; i < count; i++)
-                samples[i] = Vector(span.Slice(i*6, 6)) * scale;
-            
+                samples[i] = Vector(span.Slice(i * 6, 6)) * scale;
+
             return samples;
         }
-         
-        public static Vector Vector(ReadOnlySpan<byte> span)
+
+        public Vector Vector(ReadOnlySpan<byte> span)
         {
             return new Vector
             {
@@ -98,13 +98,13 @@ namespace Muse.Net.Client
             };
         }
 
-        public static ushort UShort(ReadOnlySpan<byte> span, int index = 0)
+        public ushort UShort(ReadOnlySpan<byte> span, int index = 0)
         {
             return BinaryPrimitives.ReadUInt16BigEndian(span.Slice(index, 2));
         }
 
-        public static short Int16(ReadOnlySpan<byte> span, int index = 0)
-        { 
+        public short Int16(ReadOnlySpan<byte> span, int index = 0)
+        {
             return BinaryPrimitives.ReadInt16BigEndian(span.Slice(index, 2));
         }
     }

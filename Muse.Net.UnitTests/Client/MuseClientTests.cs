@@ -19,7 +19,9 @@ namespace Muse.Net.UnitTests.Client
             // Arrange
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
             var deviceId = (ulong)100;
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.Setup(x => x.Connect(
                 It.IsAny<ulong>(),
@@ -43,7 +45,9 @@ namespace Muse.Net.UnitTests.Client
         {
             // Arrange
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.Setup(x => x.UnsubscribeAll())
                 .Returns(Task.CompletedTask);
@@ -76,7 +80,9 @@ namespace Muse.Net.UnitTests.Client
                 Channel.Gyroscope,
                 Channel.Telemetry
             };
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.Setup(x => x.SubscribeToChannel(
                 It.IsAny<Channel>()))
@@ -111,7 +117,9 @@ namespace Muse.Net.UnitTests.Client
         {
             // Arrange
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.Setup(x => x.UnsubscribeAll())
                 .Returns(Task.CompletedTask);
@@ -129,7 +137,9 @@ namespace Muse.Net.UnitTests.Client
             // Arrange
             var mockGattCharacteristic = new Mock<IGattCharacteristic>();
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.SetupGet(x => x.Characteristics[Channel.Control])
                 .Returns(mockGattCharacteristic.Object);
@@ -148,7 +158,9 @@ namespace Muse.Net.UnitTests.Client
             // Arrange
             var mockGattCharacteristic = new Mock<IGattCharacteristic>();
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.SetupGet(x => x.Characteristics[Channel.Control])
                 .Returns(mockGattCharacteristic.Object);
@@ -167,7 +179,9 @@ namespace Muse.Net.UnitTests.Client
             // Arrange
             var mockGattCharacteristic = new Mock<IGattCharacteristic>();
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.SetupGet(x => x.Characteristics[Channel.Control])
                 .Returns(mockGattCharacteristic.Object);
@@ -186,7 +200,9 @@ namespace Muse.Net.UnitTests.Client
             // Arrange
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
             var channel = Channel.EEG_AF7;
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.Setup(x => x.SubscribeToChannel(
                 It.IsAny<Channel>()))
@@ -207,7 +223,9 @@ namespace Muse.Net.UnitTests.Client
             // Arrange
             var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
             var channel = Channel.EEG_AF7;
-            var sut = new MuseClient(mockBluetoothClient.Object);
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                null);
 
             mockBluetoothClient.Setup(x => x.UnsubscribeFromChannel(
                 It.IsAny<Channel>()))

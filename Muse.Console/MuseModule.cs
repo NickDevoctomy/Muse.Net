@@ -4,6 +4,7 @@ using Harthoorn.MuseClient;
 using Muse.Net.Client;
 using Muse.Net.Models;
 using Muse.Net.Models.Enums;
+using Muse.Net.Services;
 using Shell.Routing;
 
 namespace ConsoleApp
@@ -52,7 +53,7 @@ namespace ConsoleApp
       
         public async Task<Telemetry> TelemetryAsync()
         {
-            var client = new MuseClient(new WindowsDesktopBluetoothClient<Channel>());
+            var client = new MuseClient(new WindowsDesktopBluetoothClient<Channel>(), new MuseDataParserService());
 
             // !!! get device id here
 

@@ -15,13 +15,17 @@ namespace Muse.Net.Client
         public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
 
         private readonly IBluetoothClient<Channel, IGattCharacteristic> _bluetoothClient;
+        private readonly IMuseDataParserService _museDataParserService;
 
         public bool Connected => _bluetoothClient.Connected;
 
-        public MuseClient(IBluetoothClient<Channel, IGattCharacteristic> bluetoothClient)
+        public MuseClient(
+            IBluetoothClient<Channel, IGattCharacteristic> bluetoothClient,
+            IMuseDataParserService museDataParserService)
         {
             _bluetoothClient = bluetoothClient;
             _bluetoothClient.OnGattValueChanged = OnGattValueChanged;
+            _museDataParserService = museDataParserService;
         }
 
         public Task<bool> Connect(ulong deviceAddress)
@@ -106,7 +110,7 @@ namespace Muse.Net.Client
             var bytes = await _bluetoothClient.SingleChannelEventAsync(Channel.Telemetry);
             if (bytes != null)
             {
-                return Parse.Telemetry(bytes);
+                return _museDataParserService.Telemetry(bytes);
             }
             else return null;
         }
@@ -115,25 +119,25 @@ namespace Muse.Net.Client
             Channel channel,
             ReadOnlySpan<byte> bytes)
         { 
-            var eeg = Parse.Encefalogram(bytes);
+            var eeg = _museDataParserService.Encefalogram(bytes);
             NotifyEeg?.Invoke(this, new MuseClientNotifyEegEventArgs { Channel = channel, Encefalogram = eeg });
         }
 
         private void TriggerNotifyTelemetry(ReadOnlySpan<byte> bytes)
         {
-            var telemetry = Parse.Telemetry(bytes);
+            var telemetry = _museDataParserService.Telemetry(bytes);
             NotifyTelemetry?.Invoke(this, new MuseClientNotifyTelemetryEventArgs { Telemetry = telemetry });
         }
 
         private void TriggerNotifyAccelerometer(ReadOnlySpan<byte> bytes)
         {
-            var accelerometer = Parse.Accelerometer(bytes);
+            var accelerometer = _museDataParserService.Accelerometer(bytes);
             NotifyAccelerometer?.Invoke(this, new MuseClientNotifyAccelerometerEventArgs { Accelerometer = accelerometer });
         }
 
         private void TriggerNotifyGyroscope(ReadOnlySpan<byte> bytes)
         {
-            var gyroscope = Parse.Gyroscope(bytes);
+            var gyroscope = _museDataParserService.Gyroscope(bytes);
             NotifyGyroscope?.Invoke(this, new MuseClientNotifyGyroscopeEventArgs { Gyroscope = gyroscope });
         }
     }

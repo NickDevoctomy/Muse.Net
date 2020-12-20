@@ -14,7 +14,7 @@ namespace ConsoleApp
     {
         public static async Task Collect()
         {
-            var client = new MuseClient(new WindowsDesktopBluetoothClient<Channel>());
+            var client = new MuseClient(new WindowsDesktopBluetoothClient<Channel>(), new MuseDataParserService());
             Console.WriteLine("Connecting...");
             var ok = await client.Connect(MyMuse.Address);
             if (ok)
