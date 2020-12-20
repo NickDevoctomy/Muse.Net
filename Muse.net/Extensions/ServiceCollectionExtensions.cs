@@ -11,7 +11,7 @@ namespace Muse.Net.Extensions
         public static void AddMuseServices(this ServiceCollection serviceCollection)
         {
             serviceCollection.AddScoped<IMuseDeviceDiscoveryService, WindowsDesktopMuseDeviceDiscoveryService>();
-            serviceCollection.AddScoped<IBluetoothClient<Channel, GattCharacteristic>, WindowsDesktopBluetoothClient<Channel>>();
+            serviceCollection.AddScoped<IBluetoothClient<Channel, IGattCharacteristic>, WindowsDesktopBluetoothClient<Channel>>();
             serviceCollection.AddScoped<IMuseClient, MuseClient>();
         }
     }

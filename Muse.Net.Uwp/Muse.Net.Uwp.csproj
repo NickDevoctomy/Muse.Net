@@ -120,6 +120,12 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\Muse.net\Client\IGattCharacteristic.cs">
+      <Link>Client\IGattCharacteristic.cs</Link>
+    </Compile>
+    <Compile Include="..\Muse.net\Client\WrappedGatCharacteristic.cs">
+      <Link>Client\WrappedGatCharacteristic.cs</Link>
+    </Compile>
     <Compile Include="..\Muse.net\Extensions\CharacteristicExtensions.cs">
       <Link>Extensions\CharacteristicExtensions.cs</Link>
     </Compile>

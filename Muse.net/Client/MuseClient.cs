@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Muse.Net.Services;
 using Muse.Net.Models;
-using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Muse.Net.Client
 {
@@ -16,11 +15,11 @@ namespace Muse.Net.Client
         public event EventHandler<MuseClientNotifyGyroscopeEventArgs> NotifyGyroscope;
         public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
 
-        private readonly IBluetoothClient<Channel, GattCharacteristic> _bluetoothClient;
+        private readonly IBluetoothClient<Channel, IGattCharacteristic> _bluetoothClient;
 
         public bool Connected => _bluetoothClient.Connected;
 
-        public MuseClient(IBluetoothClient<Channel, GattCharacteristic> bluetoothClient)
+        public MuseClient(IBluetoothClient<Channel, IGattCharacteristic> bluetoothClient)
         {
             _bluetoothClient = bluetoothClient;
             _bluetoothClient.OnGattValueChanged = OnGattValueChanged;
