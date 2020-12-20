@@ -6,7 +6,7 @@ namespace Muse.Net.Services
 {
     public class MuseDataParserService : IMuseDataParserService
     {
-        public Telemetry Telemetry(ReadOnlySpan<byte> span)
+        public Telemetry Telemetry(byte[] span)
         {
             return new Telemetry
             {
@@ -17,33 +17,36 @@ namespace Muse.Net.Services
             };
         }
 
-        public Gyroscope Gyroscope(ReadOnlySpan<byte> span)
+        public Gyroscope Gyroscope(byte[] span)
         {
+            var roSpan = new ReadOnlySpan<byte>(span);
             return new Gyroscope
             {
                 SequenceId = UShort(span, 0),
-                Samples = Samples(span.Slice(2), 3, Scale.GYROSCOPE)
+                Samples = Samples(roSpan.Slice(2), 3, Scale.GYROSCOPE)
             };
         }
 
-        public Accelerometer Accelerometer(ReadOnlySpan<byte> span)
+        public Accelerometer Accelerometer(byte[] span)
         {
+            var roSpan = new ReadOnlySpan<byte>(span);
             return new Accelerometer
             {
                 SequenceId = UShort(span, 0),
-                Samples = Samples(span.Slice(2), 3, Scale.ACCELEROMETER)
+                Samples = Samples(roSpan.Slice(2), 3, Scale.ACCELEROMETER)
             };
         }
 
-        public Encefalogram Encefalogram(ReadOnlySpan<byte> span)
+        public Encefalogram Encefalogram(byte[] span)
         {
-            var samples = EegSamples(span.Slice(2));
+            var roSpan = new ReadOnlySpan<byte>(span);
+            var samples = EegSamples(roSpan.Slice(2));
             return new Encefalogram
             {
                 Index = UShort(span, 0),
                 Timestamp = DateTimeOffset.Now,
                 Samples = samples,
-                Raw = span.ToArray()
+                Raw = roSpan.ToArray()
             };
         }
 

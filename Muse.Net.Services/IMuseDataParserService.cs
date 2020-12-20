@@ -5,10 +5,10 @@ namespace Muse.Net.Services
 {
     public interface IMuseDataParserService
     {
-        Telemetry Telemetry(ReadOnlySpan<byte> span);
-        Gyroscope Gyroscope(ReadOnlySpan<byte> span);
-        Accelerometer Accelerometer(ReadOnlySpan<byte> span);
-        Encefalogram Encefalogram(ReadOnlySpan<byte> span);
+        Telemetry Telemetry(byte[] span);
+        Gyroscope Gyroscope(byte[] span);
+        Accelerometer Accelerometer(byte[] span);
+        Encefalogram Encefalogram(byte[] span);
         float[] EegSamples(ReadOnlySpan<byte> span);
         void ScaleEeg(float[] samples);
         Vector[] Samples(ReadOnlySpan<byte> span, int count, float scale);

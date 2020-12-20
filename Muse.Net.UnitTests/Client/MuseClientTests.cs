@@ -3,6 +3,7 @@ using Moq;
 using Muse.Net.Client;
 using Muse.Net.Models.Enums;
 using Muse.Net.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -238,6 +239,190 @@ namespace Muse.Net.UnitTests.Client
             Assert.IsTrue(result);
             mockBluetoothClient.Verify(x => x.UnsubscribeFromChannel(
                 It.IsAny<Channel>()), Times.Once);
+        }
+
+        [TestMethod]
+        public async Task GivenMuseClient_WhenReadTelemetryAsync_ThenBluetoothClientSingleChannelEventAsync_AndParserTelemetry_AndResultReturned()
+        {
+            // Arrange
+            var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
+            var mockMuseDataParser = new Mock<IMuseDataParserService>();
+            var channelData = new byte[] { 1, 2, 3 };
+            var parsedTelemetry = new Models.Telemetry();
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                mockMuseDataParser.Object);
+
+            mockBluetoothClient.Setup(x => x.SingleChannelEventAsync(
+                It.IsAny<Channel>()))
+                .ReturnsAsync(channelData);
+
+            mockMuseDataParser.Setup(x => x.Telemetry(
+                It.IsAny<byte[]>()))
+                .Returns(parsedTelemetry);
+
+            // Act
+            var result = await sut.ReadTelemetryAsync();
+
+            // Assert
+            Assert.AreEqual(result, parsedTelemetry);
+            mockBluetoothClient.Verify(x => x.SingleChannelEventAsync(
+                It.Is<Channel>(y => y == Channel.Telemetry)), Times.Once);
+            mockMuseDataParser.Verify(x => x.Telemetry(
+                It.Is<byte[]>(y => y == channelData)), Times.Once);
+        }
+
+
+        [TestMethod]
+        public void GivenMuseClient_WhenBluetoothClientOnGattValueChanged_AndTelemetryChannel_ThenParserTelemetry_AndNotified()
+        {
+            // Arrange
+            var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
+            var mockMuseDataParser = new Mock<IMuseDataParserService>();
+            var channel = Channel.Telemetry;
+            var data = new byte[] { 1, 2, 3, 4 };
+            var parsedTelemetry = new Models.Telemetry();
+            var onGattValueChanged = default(Action<Channel, byte[]>);
+            mockBluetoothClient.SetupSet(p => p.OnGattValueChanged = It.IsAny<Action<Channel, byte[]>>())
+                .Callback<Action<Channel, byte[]>>(value => onGattValueChanged = value);
+
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                mockMuseDataParser.Object);
+
+            var notified = false;
+            sut.NotifyTelemetry += (s, a) =>
+            {
+                notified = a.Telemetry == parsedTelemetry;
+            };
+
+            mockMuseDataParser.Setup(x => x.Telemetry(
+                It.IsAny<byte[]>()))
+                .Returns(parsedTelemetry);
+
+            // Act
+            onGattValueChanged(
+                channel,
+                data);
+
+            // Assert
+            mockMuseDataParser.Verify(x => x.Telemetry(
+                It.IsAny<byte[]>()), Times.Once);
+            Assert.IsTrue(notified);
+        }
+
+        [TestMethod]
+        public void GivenMuseClient_WhenBluetoothClientOnGattValueChanged_AndAccelerometerChannel_ThenParserAccelerometer_AndNotified()
+        {
+            // Arrange
+            var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
+            var mockMuseDataParser = new Mock<IMuseDataParserService>();
+            var channel = Channel.Accelerometer;
+            var data = new byte[] { 1, 2, 3, 4 };
+            var parsedAccelerometer = new Models.Accelerometer();
+            var onGattValueChanged = default(Action<Channel, byte[]>);
+            mockBluetoothClient.SetupSet(p => p.OnGattValueChanged = It.IsAny<Action<Channel, byte[]>>())
+                .Callback<Action<Channel, byte[]>>(value => onGattValueChanged = value);
+
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                mockMuseDataParser.Object);
+
+            var notified = false;
+            sut.NotifyAccelerometer += (s, a) =>
+            {
+                notified = a.Accelerometer == parsedAccelerometer;
+            };
+
+            mockMuseDataParser.Setup(x => x.Accelerometer(
+                It.IsAny<byte[]>()))
+                .Returns(parsedAccelerometer);
+
+            // Act
+            onGattValueChanged(
+                channel,
+                data);
+
+            // Assert
+            mockMuseDataParser.Verify(x => x.Accelerometer(
+                It.IsAny<byte[]>()), Times.Once);
+            Assert.IsTrue(notified);
+        }
+
+        [TestMethod]
+        public void GivenMuseClient_WhenBluetoothClientOnGattValueChanged_AndGyroscopeChannel_ThenParserGyroscope_AndNotified()
+        {
+            // Arrange
+            var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
+            var mockMuseDataParser = new Mock<IMuseDataParserService>();
+            var channel = Channel.Gyroscope;
+            var data = new byte[] { 1, 2, 3, 4 };
+            var parsedGyroscope = new Models.Gyroscope();
+            var onGattValueChanged = default(Action<Channel, byte[]>);
+            mockBluetoothClient.SetupSet(p => p.OnGattValueChanged = It.IsAny<Action<Channel, byte[]>>())
+                .Callback<Action<Channel, byte[]>>(value => onGattValueChanged = value);
+
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                mockMuseDataParser.Object);
+
+            var notified = false;
+            sut.NotifyGyroscope += (s, a) =>
+            {
+                notified = a.Gyroscope == parsedGyroscope;
+            };
+
+            mockMuseDataParser.Setup(x => x.Gyroscope(
+                It.IsAny<byte[]>()))
+                .Returns(parsedGyroscope);
+
+            // Act
+            onGattValueChanged(
+                channel,
+                data);
+
+            // Assert
+            mockMuseDataParser.Verify(x => x.Gyroscope(
+                It.IsAny<byte[]>()), Times.Once);
+            Assert.IsTrue(notified);
+        }
+
+        [TestMethod]
+        public void GivenMuseClient_WhenBluetoothClientOnGattValueChanged_AndAuxChannel_ThenParserGyroscope_AndNotified()
+        {
+            // Arrange
+            var mockBluetoothClient = new Mock<IBluetoothClient<Channel, IGattCharacteristic>>();
+            var mockMuseDataParser = new Mock<IMuseDataParserService>();
+            var channel = Channel.EEG_AUX;
+            var data = new byte[] { 1, 2, 3, 4 };
+            var parsedEncefalogram = new Models.Encefalogram();
+            var onGattValueChanged = default(Action<Channel, byte[]>);
+            mockBluetoothClient.SetupSet(p => p.OnGattValueChanged = It.IsAny<Action<Channel, byte[]>>())
+                .Callback<Action<Channel, byte[]>>(value => onGattValueChanged = value);
+
+            var sut = new MuseClient(
+                mockBluetoothClient.Object,
+                mockMuseDataParser.Object);
+
+            var notified = false;
+            sut.NotifyEeg += (s, a) =>
+            {
+                notified = a.Encefalogram == parsedEncefalogram;
+            };
+
+            mockMuseDataParser.Setup(x => x.Encefalogram(
+                It.IsAny<byte[]>()))
+                .Returns(parsedEncefalogram);
+
+            // Act
+            onGattValueChanged(
+                channel,
+                data);
+
+            // Assert
+            mockMuseDataParser.Verify(x => x.Encefalogram(
+                It.IsAny<byte[]>()), Times.Once);
+            Assert.IsTrue(notified);
         }
 
         private bool AssertConnectionChannels(KeyValuePair<Channel, System.Guid>[] connectionChannels)

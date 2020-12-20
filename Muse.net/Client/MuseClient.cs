@@ -119,25 +119,25 @@ namespace Muse.Net.Client
             Channel channel,
             ReadOnlySpan<byte> bytes)
         { 
-            var eeg = _museDataParserService.Encefalogram(bytes);
+            var eeg = _museDataParserService.Encefalogram(bytes.ToArray());
             NotifyEeg?.Invoke(this, new MuseClientNotifyEegEventArgs { Channel = channel, Encefalogram = eeg });
         }
 
         private void TriggerNotifyTelemetry(ReadOnlySpan<byte> bytes)
         {
-            var telemetry = _museDataParserService.Telemetry(bytes);
+            var telemetry = _museDataParserService.Telemetry(bytes.ToArray());
             NotifyTelemetry?.Invoke(this, new MuseClientNotifyTelemetryEventArgs { Telemetry = telemetry });
         }
 
         private void TriggerNotifyAccelerometer(ReadOnlySpan<byte> bytes)
         {
-            var accelerometer = _museDataParserService.Accelerometer(bytes);
+            var accelerometer = _museDataParserService.Accelerometer(bytes.ToArray());
             NotifyAccelerometer?.Invoke(this, new MuseClientNotifyAccelerometerEventArgs { Accelerometer = accelerometer });
         }
 
         private void TriggerNotifyGyroscope(ReadOnlySpan<byte> bytes)
         {
-            var gyroscope = _museDataParserService.Gyroscope(bytes);
+            var gyroscope = _museDataParserService.Gyroscope(bytes.ToArray());
             NotifyGyroscope?.Invoke(this, new MuseClientNotifyGyroscopeEventArgs { Gyroscope = gyroscope });
         }
     }
