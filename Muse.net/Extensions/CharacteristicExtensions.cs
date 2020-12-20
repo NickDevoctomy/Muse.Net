@@ -6,7 +6,9 @@ namespace Muse.Net.Extensions
 {
     public static class CharacteristicExtensions
     {
-        public async static Task<bool> WriteCommand(this GattCharacteristic control, string command)
+        public async static Task<bool> WriteCommand(
+            this GattCharacteristic control,
+            string command)
         {
             var buffer = command.EncodeCommandAsBuffer();
             var status = await control.WriteValueAsync(buffer, GattWriteOption.WriteWithoutResponse).AsTask();

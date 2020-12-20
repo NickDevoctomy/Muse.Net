@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Harthoorn.MuseClient;
 using Muse.Net.Client;
 using Muse.Net.Models;
+using Muse.Net.Models.Enums;
 using Shell.Routing;
 
 namespace ConsoleApp
@@ -51,7 +52,9 @@ namespace ConsoleApp
       
         public async Task<Telemetry> TelemetryAsync()
         {
-            var client = new MuseClient();
+            var client = new MuseClient(new WindowsDesktopBluetoothClient<Channel>());
+
+            // !!! get device id here
 
             Console.Write("\rConnecting...");
             //await client.Connect();
@@ -59,7 +62,7 @@ namespace ConsoleApp
             await client.Resume();
 
             Console.WriteLine("\rWaiting for signal...");
-            var telemetry = new Telemetry(); //await client.ReadTelemetryAsync();
+            var telemetry = await client.ReadTelemetryAsync();
             
             await client.Disconnect();
             return telemetry;

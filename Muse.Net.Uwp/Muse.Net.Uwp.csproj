@@ -120,9 +120,6 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="..\Muse.net\Client\BluetoothClient.cs">
-      <Link>Client\BluetoothClient.cs</Link>
-    </Compile>
     <Compile Include="..\Muse.net\Extensions\CharacteristicExtensions.cs">
       <Link>Extensions\CharacteristicExtensions.cs</Link>
     </Compile>
@@ -144,11 +141,16 @@
     <Compile Include="..\Muse.net\Client\Scale.cs">
       <Link>Client\Scale.cs</Link>
     </Compile>
+    <Compile Include="Client\UwpBluetoothClient.cs" />
     <Compile Include="Client\UwpMuseDeviceDiscoveryService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Extensions\ServiceCollectionExtensions.cs" />
     <EmbeddedResource Include="Properties\Muse.Net.Uwp.rd.xml" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection">
+      <Version>5.0.1</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.11</Version>
     </PackageReference>

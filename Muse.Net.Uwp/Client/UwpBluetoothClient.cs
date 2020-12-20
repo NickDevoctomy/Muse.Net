@@ -1,31 +1,35 @@
-﻿using System;
+﻿using Muse.Net.Client;
+using Muse.Net.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Devices.Bluetooth;
 using Windows.Devices.Bluetooth.GenericAttributeProfile;
 using Windows.Foundation;
 
-namespace Muse.Net.Client
+namespace Muse.Net.Uwp.Client
 {
-    public class BluetoothClient<CharacteristicKeyType>
+    public class UwpBluetoothClient<GattCharacteristicKeyType> : IBluetoothClient<GattCharacteristicKeyType, GattCharacteristic>
     {
         private BluetoothLEDevice _device;
         private GattDeviceService _service;
-        private Dictionary<CharacteristicKeyType, GattCharacteristic> _charcteristics = new Dictionary<CharacteristicKeyType, GattCharacteristic>();
+        private Dictionary<GattCharacteristicKeyType, GattCharacteristic> _charcteristics = new Dictionary<GattCharacteristicKeyType, GattCharacteristic>();
+        private IList<GattCharacteristicKeyType> _subscriptions = new List<GattCharacteristicKeyType>();
 
         public string Name { get; private set; }
         public ulong Address { get; private set; }
         public bool Connected { get; private set; } = false;
-        public IReadOnlyDictionary<CharacteristicKeyType, GattCharacteristic> Characteristics => _charcteristics;
-        public IList<CharacteristicKeyType> Subscriptions { get; private set; } = new List<CharacteristicKeyType>();
+        public IReadOnlyDictionary<GattCharacteristicKeyType, GattCharacteristic> Characteristics => _charcteristics;
 
-#if WINDOWS_UWP
+        public Action<GattCharacteristicKeyType, byte[]> OnGattValueChanged { get; set; }
+
         public async Task<bool> Connect(
             ulong deviceAddress,
             Guid service,
-            params KeyValuePair<CharacteristicKeyType, Guid>[] characteristics)
+            params KeyValuePair<GattCharacteristicKeyType, Guid>[] characteristics)
         {
             Address = deviceAddress;
             _device = await BluetoothLEDevice.FromBluetoothAddressAsync(this.Address);
@@ -65,38 +69,6 @@ namespace Muse.Net.Client
             Connected = true;
             return true;
         }
-#else
-        public async Task<bool> Connect(
-            ulong deviceAddress,
-            Guid service,
-            params KeyValuePair<CharacteristicKeyType, Guid>[] characteristics)
-        {
-            Address = deviceAddress;
-            _device = await BluetoothLEDevice.FromBluetoothAddressAsync(Address);
-            if (_device is null)
-            {
-                return false;
-            }
-
-            Name = _device.Name;
-            _service = _device.GetGattService(service);
-            if (_service is null)
-            {
-                return false;
-            }
-
-            foreach(var curCharacteristic in characteristics)
-            {
-                var characteristic = _service.GetCharacteristics(curCharacteristic.Value).FirstOrDefault();
-                _charcteristics.Add(
-                    curCharacteristic.Key,
-                    characteristic);
-            }
-
-            Connected = true;
-            return true;
-        }
-#endif
 
         public virtual Task Disconnect()
         {
@@ -110,7 +82,7 @@ namespace Muse.Net.Client
             return Task.CompletedTask;
         }
 
-        public virtual async Task<bool> SubscribeToChannel(CharacteristicKeyType characteristicKey)
+        public async Task<bool> SubscribeToChannel(GattCharacteristicKeyType characteristicKey)
         {
             var characteristic = Characteristics[characteristicKey];
             var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.Notify);
@@ -118,13 +90,21 @@ namespace Muse.Net.Client
             if (ok)
             {
                 characteristic.ValueChanged += GattValueChanged;
-                Subscriptions.Add(characteristicKey);
+                _subscriptions.Add(characteristicKey);
             }
 
             return ok;
         }
 
-        public virtual async Task<bool> UnsubscribeFromChannel(CharacteristicKeyType characteristicKey)
+        public async Task UnsubscribeAll()
+        {
+            foreach (var channel in _subscriptions)
+            {
+                await UnsubscribeFromChannel(channel);
+            }
+        }
+
+        public async Task<bool> UnsubscribeFromChannel(GattCharacteristicKeyType characteristicKey)
         {
             var characteristic = Characteristics[characteristicKey];
             var status = await characteristic.WriteClientCharacteristicConfigurationDescriptorAsync(GattClientCharacteristicConfigurationDescriptorValue.None);
@@ -132,14 +112,14 @@ namespace Muse.Net.Client
             if (ok)
             {
                 characteristic.ValueChanged -= GattValueChanged;
-                Subscriptions.Remove(characteristicKey);
+                _subscriptions.Remove(characteristicKey);
             }
 
             return ok;
         }
 
-        protected async Task<bool> SubscribeEvent(
-            CharacteristicKeyType characteristicKey,
+        private async Task<bool> SubscribeEvent(
+            GattCharacteristicKeyType characteristicKey,
             TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler)
         {
             var characteristic = Characteristics[characteristicKey];
@@ -164,8 +144,8 @@ namespace Muse.Net.Client
             return alreadyOn;
         }
 
-        protected async Task UnsubscribeEvent(
-            CharacteristicKeyType characteristicKey,
+        private async Task UnsubscribeEvent(
+            GattCharacteristicKeyType characteristicKey,
             TypedEventHandler<GattCharacteristic, GattValueChangedEventArgs> handler,
             bool keepOn)
         {
@@ -178,7 +158,7 @@ namespace Muse.Net.Client
             }
         }
 
-        protected async Task<byte[]> SingleChannelEventAsync(CharacteristicKeyType characteristicKey)
+        public async Task<byte[]> SingleChannelEventAsync(GattCharacteristicKeyType characteristicKey)
         {
             var completion = new TaskCompletionSource<byte[]>();
             bool keep = await SubscribeEvent(characteristicKey, NotifyTaskCompletion);
@@ -200,17 +180,14 @@ namespace Muse.Net.Client
             GattCharacteristic sender,
             GattValueChangedEventArgs args)
         {
-            CharacteristicKeyType characteristicKeyType = Characteristics.SingleOrDefault(x => x.Value == sender).Key;
+            GattCharacteristicKeyType characteristicKeyType = Characteristics.SingleOrDefault(x => x.Value == sender).Key;
             var data = args.CharacteristicValue.ToArray();
-            OnGattValueChanged(
-                characteristicKeyType,
-                data);
-        }
-
-        protected virtual void OnGattValueChanged(
-            CharacteristicKeyType characteristicKeyType,
-            byte[] data)
-        {
+            if (OnGattValueChanged != null)
+            {
+                OnGattValueChanged(
+                    characteristicKeyType,
+                    data);
+            }
         }
     }
 }

@@ -5,23 +5,30 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Muse.Net.Services;
 using Muse.Net.Models;
+using Windows.Devices.Bluetooth.GenericAttributeProfile;
 
 namespace Muse.Net.Client
 {
-    public class MuseClient : BluetoothClient<Channel>, IMuseClient
+    public class MuseClient : IMuseClient
     {
         public event EventHandler<MuseClientNotifyTelemetryEventArgs> NotifyTelemetry;
         public event EventHandler<MuseClientNotifyAccelerometerEventArgs> NotifyAccelerometer;
         public event EventHandler<MuseClientNotifyGyroscopeEventArgs> NotifyGyroscope;
         public event EventHandler<MuseClientNotifyEegEventArgs> NotifyEeg;
 
-        public MuseClient()
+        private readonly IBluetoothClient<Channel, GattCharacteristic> _bluetoothClient;
+
+        public bool Connected => _bluetoothClient.Connected;
+
+        public MuseClient(IBluetoothClient<Channel, GattCharacteristic> bluetoothClient)
         {
+            _bluetoothClient = bluetoothClient;
+            _bluetoothClient.OnGattValueChanged = OnGattValueChanged;
         }
 
         public Task<bool> Connect(ulong deviceAddress)
         {
-            return base.Connect(
+            return _bluetoothClient.Connect(
                 deviceAddress,
                 MuseGuid.PRIMARY_SERVICE,
                 new KeyValuePair<Channel, Guid>(Channel.Control, MuseGuid.CONTROL),
@@ -35,10 +42,10 @@ namespace Muse.Net.Client
                 new KeyValuePair<Channel, Guid>(Channel.EEG_AUX, MuseGuid.EEG_AUX));
         }
 
-        public override async Task Disconnect()
+        public async Task Disconnect()
         {
-            await UnsubscribeAll();
-            await base.Disconnect();
+            await _bluetoothClient.UnsubscribeAll();
+            await _bluetoothClient.Disconnect();
         }
 
         public async Task Subscribe(params Channel[] channels)
@@ -49,40 +56,37 @@ namespace Muse.Net.Client
             }
         }
 
+        public Task UnsubscribeAll()
+        {
+            return _bluetoothClient.UnsubscribeAll();
+        }
+
         public async Task Resume()
         {
-            await base.Characteristics[Channel.Control].WriteCommand(MuseCommand.RESUME);
+            await _bluetoothClient.Characteristics[Channel.Control].WriteCommand(MuseCommand.RESUME);
         }
 
         public async Task Start()
         {
-            await base.Characteristics[Channel.Control].WriteCommand(MuseCommand.START);
+            await _bluetoothClient.Characteristics[Channel.Control].WriteCommand(MuseCommand.START);
         }
 
         public async Task Pause()
         {
-            await base.Characteristics[Channel.Control].WriteCommand(MuseCommand.PAUSE);
+            await _bluetoothClient.Characteristics[Channel.Control].WriteCommand(MuseCommand.PAUSE);
         }
 
-        public async Task UnsubscribeAll()
+        public Task<bool> SubscribeToChannel(Channel channel)
         {
-            foreach (var channel in Subscriptions)
-            {
-                await UnsubscribeFromChannel(channel);
-            }
+            return _bluetoothClient.SubscribeToChannel(channel);
         }
 
-        public override Task<bool> SubscribeToChannel(Channel channel)
+        public Task<bool> UnsubscribeFromChannel(Channel channel)
         {
-            return base.SubscribeToChannel(channel);
+            return _bluetoothClient.UnsubscribeFromChannel(channel);
         }
 
-        public override Task<bool> UnsubscribeFromChannel(Channel channel)
-        {
-            return base.UnsubscribeFromChannel(channel);
-        }
-
-        protected override void OnGattValueChanged(
+        protected void OnGattValueChanged(
             Channel characteristicKeyType,
             byte[] data)
         {
@@ -101,7 +105,7 @@ namespace Muse.Net.Client
 
         public async Task<Telemetry> ReadTelemetryAsync()
         {
-            var bytes = await SingleChannelEventAsync(Channel.Telemetry);
+            var bytes = await _bluetoothClient.SingleChannelEventAsync(Channel.Telemetry);
             if (bytes != null)
             {
                 return Parse.Telemetry(bytes);

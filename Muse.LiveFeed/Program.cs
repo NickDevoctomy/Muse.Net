@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Muse.Net.Client;
+using Muse.Net.Extensions;
 using Muse.Net.Services;
 using System;
 using System.Windows.Forms;
@@ -26,8 +27,7 @@ namespace Muse.LiveFeed
         private static void ConfigureServices(ServiceCollection serviceCollection)
         {
             serviceCollection.AddTransient<frmMain>();
-            serviceCollection.AddScoped<IMuseDeviceDiscoveryService, WindowsDesktopMuseDeviceDiscoveryService>();
-            serviceCollection.AddScoped<IMuseClient, MuseClient>();
+            serviceCollection.AddMuseServices();
         }
     }
 }

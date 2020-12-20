@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Harthoorn.MuseClient;
 using System.Collections.Generic;
 using System.Threading;
 using System.Linq;
@@ -15,7 +14,7 @@ namespace ConsoleApp
     {
         public static async Task Collect()
         {
-            var client = new MuseClient();
+            var client = new MuseClient(new WindowsDesktopBluetoothClient<Channel>());
             Console.WriteLine("Connecting...");
             var ok = await client.Connect(MyMuse.Address);
             if (ok)
