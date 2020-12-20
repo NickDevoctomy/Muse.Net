@@ -6,44 +6,44 @@ namespace Muse.Net.Services
 {
     public class MuseDataParserService : IMuseDataParserService
     {
-        public Telemetry Telemetry(byte[] span)
+        public Telemetry Telemetry(byte[] data)
         {
             return new Telemetry
             {
-                SequenceId = UShort(span, 0),
-                BatteryLevel = UShort(span, 2) / 512f,      // percentage
-                Voltage = UShort(span, 4) * 2.2f,           // don't know why
-                Temperature = UShort(span, 8)
+                SequenceId = UShort(data, 0),
+                BatteryLevel = UShort(data, 2) / 512f,      // percentage
+                Voltage = UShort(data, 4) * 2.2f,           // don't know why
+                Temperature = UShort(data, 8)
             };
         }
 
-        public Gyroscope Gyroscope(byte[] span)
+        public Gyroscope Gyroscope(byte[] data)
         {
-            var roSpan = new ReadOnlySpan<byte>(span);
+            var roSpan = new ReadOnlySpan<byte>(data);
             return new Gyroscope
             {
-                SequenceId = UShort(span, 0),
+                SequenceId = UShort(data, 0),
                 Samples = Samples(roSpan.Slice(2), 3, Scale.GYROSCOPE)
             };
         }
 
-        public Accelerometer Accelerometer(byte[] span)
+        public Accelerometer Accelerometer(byte[] data)
         {
-            var roSpan = new ReadOnlySpan<byte>(span);
+            var roSpan = new ReadOnlySpan<byte>(data);
             return new Accelerometer
             {
-                SequenceId = UShort(span, 0),
+                SequenceId = UShort(data, 0),
                 Samples = Samples(roSpan.Slice(2), 3, Scale.ACCELEROMETER)
             };
         }
 
-        public Encefalogram Encefalogram(byte[] span)
+        public Encefalogram Encefalogram(byte[] data)
         {
-            var roSpan = new ReadOnlySpan<byte>(span);
+            var roSpan = new ReadOnlySpan<byte>(data);
             var samples = EegSamples(roSpan.Slice(2));
             return new Encefalogram
             {
-                Index = UShort(span, 0),
+                Index = UShort(data, 0),
                 Timestamp = DateTimeOffset.Now,
                 Samples = samples,
                 Raw = roSpan.ToArray()
@@ -82,7 +82,10 @@ namespace Muse.Net.Services
             }
         }
 
-        public Vector[] Samples(ReadOnlySpan<byte> span, int count, float scale)
+        public Vector[] Samples(
+            ReadOnlySpan<byte> span,
+            int count,
+            float scale)
         {
             var samples = new Vector[3];
             for (int i = 0; i < count; i++)
@@ -101,12 +104,16 @@ namespace Muse.Net.Services
             };
         }
 
-        public ushort UShort(ReadOnlySpan<byte> span, int index = 0)
+        public ushort UShort(
+            ReadOnlySpan<byte> span,
+            int index = 0)
         {
             return BinaryPrimitives.ReadUInt16BigEndian(span.Slice(index, 2));
         }
 
-        public short Int16(ReadOnlySpan<byte> span, int index = 0)
+        public short Int16(
+            ReadOnlySpan<byte> span,
+            int index = 0)
         {
             return BinaryPrimitives.ReadInt16BigEndian(span.Slice(index, 2));
         }
