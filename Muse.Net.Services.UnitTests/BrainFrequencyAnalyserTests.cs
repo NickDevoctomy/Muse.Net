@@ -21,7 +21,7 @@ namespace Muse.Net.Services.UnitTests
         {
             // Arrange
             var count = data.Length;
-            var sut = new BrainFrequencyAnalyser();
+            var sut = new BrainFrequencyAnalyserService();
 
             // Act
             var result = sut.GetAverageOverRange(
@@ -53,7 +53,7 @@ namespace Muse.Net.Services.UnitTests
                     Enum.Parse<FrequencyRangeGroup>(curAverage[0]),
                     float.Parse(curAverage[1])));
             }
-            var sut = new BrainFrequencyAnalyser();
+            var sut = new BrainFrequencyAnalyserService();
 
             // Act
             var result = sut.GetFrequencyRangeAverages(
@@ -74,7 +74,7 @@ namespace Muse.Net.Services.UnitTests
         {
             // Arrange
             var data = new float[] { 0, 0, 0, 0, 0 };
-            var sut = new BrainFrequencyAnalyser();
+            var sut = new BrainFrequencyAnalyserService();
 
             // Act
             var result = sut.GetFrequencyRangeAverages(

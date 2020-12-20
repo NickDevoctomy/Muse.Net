@@ -3,7 +3,7 @@ using System;
 
 namespace Muse.Net.Services
 {
-    public interface IProportionalArrayRangeSplitter
+    public interface IProportionalArrayRangeSplitterService
     {
         SplitRangeResult SplitRange(
             Array sourceArray,

@@ -28,7 +28,7 @@ namespace Muse.LiveFeed
         private readonly IFourierService _fourierService;
         private readonly IFFTSamplerService _fftSamplerService;
         private readonly IPlotterService _plotterService;
-        private readonly IBrainFrequencyAnalyser _bainFrequencyAnalyser;
+        private readonly IBrainFrequencyAnalyserService _bainFrequencyAnalyser;
 
         Bitmap _bitmapBuffer;
         Graphics _graphicsBuffer;
@@ -117,7 +117,7 @@ namespace Muse.LiveFeed
             _fourierService = new FourierService();
             _fftSamplerService = new FFTSamplerService(_fourierService);
             _plotterService = new PlotterService();
-            _bainFrequencyAnalyser = new BrainFrequencyAnalyser();
+            _bainFrequencyAnalyser = new BrainFrequencyAnalyserService();
 
             SetStyle(ControlStyles.AllPaintingInWmPaint, true);
             SetStyle(ControlStyles.OptimizedDoubleBuffer, true);

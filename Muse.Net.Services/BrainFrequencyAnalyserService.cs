@@ -5,9 +5,9 @@ using System.Linq;
 
 namespace Muse.Net.Services
 {
-    public class BrainFrequencyAnalyser : IBrainFrequencyAnalyser
+    public class BrainFrequencyAnalyserService : IBrainFrequencyAnalyserService
     {
-        private IProportionalArrayRangeSplitter _arrayRangeSplitter = new ProportionalArrayRangeSplitter();
+        private IProportionalArrayRangeSplitterService _arrayRangeSplitter = new ProportionalArrayRangeSplitter();
 
         public float GetAverageOverRange(
             float[] data,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Muse.Net.Services
 {
-    public interface IBrainFrequencyAnalyser
+    public interface IBrainFrequencyAnalyserService
     {
         float GetAverageOverRange(
             float[] data,
