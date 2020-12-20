@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Muse.Net.Services.UnitTests
 {
-    public class BrainFrequencyAnalyserTests
+    public class BrainFrequencyAnalyserServiceTests
     {
 
         [Theory]

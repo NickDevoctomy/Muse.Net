@@ -2,7 +2,7 @@
 
 namespace Muse.Net.Services.UnitTests
 {
-    public class ArrayRangeSplitterTests
+    public class ProportionalArrayRangeSplitterServiceTests
     {
         [Theory]
         [InlineData(10, 1, 5, 10, 0, 4)]
