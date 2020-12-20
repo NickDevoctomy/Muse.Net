@@ -10,8 +10,8 @@ namespace Muse.Net.Services
             new FrequencyRange
             {
                 FrequencyRangeGroup = FrequencyRangeGroup.Delta,
-                FromHz = 0.1f,
-                ToHz = 3.5f
+                FromHz = 0f,
+                ToHz = 4f
             },
             new FrequencyRange
             {

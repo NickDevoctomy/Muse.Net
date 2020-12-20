@@ -16,8 +16,8 @@ namespace Muse.Net.Services
             int toIndex = (int)Math.Ceiling((double)to / freqPerIndex);
             return new SplitRangeResult
             {
-                From = fromIndex,
-                To = toIndex
+                From = fromIndex > 0 ? fromIndex - 1 : 0,
+                To = toIndex - 1
             };
         }
     }

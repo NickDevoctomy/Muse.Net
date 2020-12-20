@@ -25,10 +25,6 @@ namespace Muse.Net.Services
             {
                 range.From = 1;
             }
-            if(range.To > data.Length)
-            {
-                range.To = data.Length; // !!! temp fix, would rather not have to adjust this here
-            }
 
             int destSize = range.To - range.From;
             var destArray = new float[destSize];
