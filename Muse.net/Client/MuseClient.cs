@@ -1,5 +1,4 @@
-﻿using Muse.Net.Extensions;
-using Muse.Net.Models.Enums;
+﻿using Muse.Net.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
